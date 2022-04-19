@@ -1,0 +1,78 @@
+{% extends "/common/layout.html" %}
+{% block content %}
+    <p style="display: none" class="case_id">{{ info.case_id }}</p>
+    <div class="row">
+        <div class="col-lg-8 col-lg-offset-2">
+            <div class="panel panel-default">
+                <div class="panel-heading apiname">{{ info.apiname | safe }}</div>
+                <p class="navbar-text "><a
+                        href="{{ buildUrl('/case/case_list') }}" class="navbar-link">返回接口列表</a></p>
+                <div class="radio navbar-center ">
+                    {% if pjlist %}
+                        {% for item in pjlist %}
+                            <label>
+                                <input class="pjname" type="radio" name="optionsRadios" id="optionsRadios1"
+                                       value={{ item | safe }} checked>
+                                {{ item | safe }}
+                            </label>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+
+                <div class="panel-body">
+                    <div class="form-horizontal param_wrap">
+                        <div class="panel-heading ">请求参数</div>
+                        {% if case_data %}
+                            {% for k in case_data %}
+                                <div class="form-group ">
+                                    <label for="paramname"
+                                           class="col-sm-2 control-label paramname">{{ k | safe }}</label>
+                                    <div class="col-sm-10">
+                                        <input type="text" class="form-control  "
+                                                {% if  case_data[k] %}
+                                                    value = {{ case_data[k] | safe }}
+                                                {% endif %}
+                                        name={{ k | safe }}>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                        <div class="panel-heading ">返回参数</div>
+                        {% if expected_results %}
+                            {% for k in expected_results %}
+                                <div class="form-group ">
+                                    <label for="exp_paramname"
+                                           class="col-sm-2 control-label exp_paramname">{{ k | safe }}</label>
+                                    <div class="col-sm-10">
+                                        <input type="text" class="form-control "
+                                                {% if  expected_results[k] %}
+                                                    value={{ expected_results[k] | safe }}
+                                                {% endif %}
+                                        name={{ k | safe }}>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                        <label for="lab"
+                               class="col-sm-2 control-label ">说明</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control  " id="explain">
+                        </div>
+
+
+                        <div class="form-group">
+                            <div class="col-sm-offset-2 col-sm-10">
+                                <button type="submit" class="btn btn-success btn-block do_add">走你</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+{% endblock %}
+{% block js %}
+    <script src="{{ buildStaticUrl('/js/case/editcase.js') }}"></script>
+{% endblock %}

@@ -1,0 +1,41 @@
+{% extends "/common/layout.html" %}
+{% block content %}
+    <div class="row">
+        <div class="col-lg-8 col-lg-offset-2">
+            <div class="panel panel-default">
+                <div class="panel-heading ">请选择测试目标服务器和项目后确认</div>
+                <div class="panel-body">
+                    <div class="form-horizontal param_wrap">
+
+                        <select class="form-control address " id="address">
+                            {% if address %}
+                                {% for item in address %}
+                                    <option>{{ item.ip | safe}}</option>
+                                {% endfor %}
+                            {% endif %}
+                           </select>
+
+
+                          <select class="form-control pjname" id="pjname">
+                            {% if pjname %}
+                                {% for item in pjname %}
+                                    <option>{{ item.pjname | safe}}</option>
+                                {% endfor %}
+                            {% endif %}
+                           </select>
+
+                        <div class="form-group">
+                            <div class="col-sm-offset-2 col-sm-8">
+                                <button type="submit" class="btn btn-success btn-block do_select">走你</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block js %}
+    <script src="{{ buildStaticUrl('/js/member/index.js') }}"></script>
+{% endblock %}
+

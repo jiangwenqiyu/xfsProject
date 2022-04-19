@@ -1,0 +1,32 @@
+{% extends "/common/layout.html" %}
+{% block content %}
+    <div class="row">
+        <div class="col-lg-8 col-lg-offset-2">
+            <div class="panel panel-default">
+                <div class="panel-heading">{{ info.apiname | safe }}</div>
+                <div class="panel-body">
+                    <div class="form-horizontal param_wrap ">
+                        {% if info %}
+                            {% for item in param %}
+                                <div class="form-group ">
+                                    <label for="inputEmail3" class="col-sm-2 control-label">{{ item | safe }}</label>
+                                    <div class="col-sm-10">
+                                        <input type="text" class="form-control">
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                        <div class="form-group">
+                            <div class="col-sm-offset-2 col-sm-10">
+                                <button type="submit" class="btn btn-success btn-block do-add">走你</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block js %}
+    <script src="{{ buildStaticUrl('/js/case/addcase.js') }}"></script>
+{% endblock %}

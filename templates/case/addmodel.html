@@ -1,0 +1,78 @@
+{% extends "/common/layout.html" %}
+{% block content %}
+    <div class="row">
+        <div class="col-lg-8 col-lg-offset-2">
+            <div class="panel panel-default">
+                <div class="panel-heading">添加用例模版</div>
+                <div class="panel-body">
+                    <div class="form-horizontal addmodel_wrap">
+                        <div class="form-group">
+                            <label for="inputEmail3" class="col-sm-2 control-label">接口名称:</label>
+                            <div class="col-sm-10">
+                                <input type="tel" class="form-control" id="apiname" name="apiname"
+                                       placeholder="(全英文)，例:orderProductPage">
+                            </div>
+                        </div>
+                                                <div class="form-group">
+                            <label for="inputEmail3" class="col-sm-2 control-label">中文解释:</label>
+                            <div class="col-sm-10">
+                                <input type="tel" class="form-control" id="explain" name="explain"
+                                       placeholder="例:供应商确认订单">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="inputEmail3" class="col-sm-2 control-label">路径:</label>
+                            <div class="col-sm-10">
+                                <input type="tel" class="form-control" id="route" name="route"
+                                       placeholder="(全英文)，例: /order/confirm">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="inputEmail3" class="col-sm-2 control-label">请求方式:</label>
+                            <div class="col-sm-10">
+                                <input type="tel" class="form-control" id="method" name="method"
+                                       placeholder="(英文大写)POST,GET,PUT">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="inputEmail3" class="col-sm-2 control-label">请求参数:</label>
+                            <div class="col-sm-10">
+                                <input type="tel" class="form-control" id="parameter" name="parameter"
+                                       placeholder="(参数之间以英文逗号分割)，例：orderNo，sessionId">
+                            </div>
+                        </div>
+                        <!--
+                        <div class="form-group">
+                            <div class="col-sm-2">
+                            <button type="submit" class="btn btn-success btn-block create_jsondata">构造返回值</button>
+                            </div>
+                            <div class="col-sm-10">
+                                <pre id="result" ></pre>
+                            </div>
+
+                            <label for="inputEmail3" class="col-sm-2 control-label">返回参数:</label>
+                            <div class="col-sm-10">
+                                <input type="tel" class="form-control" id="exp_parameter" name="exp_parameter"
+                                       placeholder="(参数之间以英文逗号分割)，例：orderNo，sessionId">
+                            </div>
+
+
+
+                        </div>
+                            -->
+                        <div class="form-group">
+                            <div class="col-sm-offset-2 col-sm-10">
+                                <button type="submit" class="btn btn-success btn-block do-addmodel">走你</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block js %}
+    <script src="{{ buildStaticUrl('/js/case/doaddmodel.js') }}"></script>
+
+{% endblock %}

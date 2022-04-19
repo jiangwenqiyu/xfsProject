@@ -1,0 +1,117 @@
+{% extends "/common/layout.html" %}
+{% block content %}
+    <style>
+        .sm-item {
+            display: flex;
+            flex-flow: row nowrap;
+            padding-left: 16px;
+            font-size: 1.6rem;
+        }
+        .item-label {
+            width: 64px;
+            min-width: 64px;
+            margin: 11px 8px 11px 0px;
+            color: rgb(153, 153, 153);
+        }
+
+        .item-text {
+            flex: 1 1 auto;
+            margin: 11px 8px 11px 16px;
+            font-family: inherit !important;
+
+            /*超过宽度，自动换行*/
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+
+    </style>
+    <div class="row">
+        <div class="col-lg-8 col-lg-offset-2">
+            <div class="panel panel-default">
+                <div class="panel-heading apiname">{{ info.apiname | safe }}</div>
+                <p class="navbar-text "><a
+                        href="{{ buildUrl('/case/case_list') }}" class="navbar-link">返回接口列表</a></p>
+
+
+                <div class="radio navbar-center ">
+                    {% if pjlist %}
+                        {% for item in pjlist %}
+                            <label>
+                                <input class="pjname" type="radio" name="optionsRadios" id="optionsRadios1"
+                                       value={{ item | safe }} checked>
+                                {{ item | safe }}
+                            </label>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+
+
+                <div class="panel-body">
+                    <div class="form-horizontal param_wrap">
+                        <div class="panel-heading ">请求参数</div>
+                        {% if info %}
+                            {% for item in param %}
+                                <div class="form-group ">
+                                    <label for="paramname"
+                                           class="col-sm-2 control-label paramname">{{ item | safe }}</label>
+                                    <div class="col-sm-10">
+                                        <input type="text" class="form-control  " name={{ item | safe }}>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+
+                        <label for="lab"
+                               class="col-sm-2 control-label ">描述</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control  " id="explain">
+                        </div>
+                        </br>
+                        </br>
+                        </br>
+                        <div class="form-group">
+                            <div class="col-sm-2">
+                                <button type="submit" class="btn btn-success btn-block create_jsondata">构造返回值</button>
+                            </div>
+                            <div class="col-sm-10">
+                                <pre id="showjson" class="result sm-item" contenteditable="true"></pre>
+                                <!--     <div placeholder="" class="col-sm-10 layui-textarea result xiaoxuxu" contenteditable="true"></div>-->
+                            </div>
+                        </div>
+                        <!--
+                        <div class="panel-heading ">返回参数</div>
+                        {% if info %}
+                            {% for item in exp_param %}
+                                <div class="form-group ">
+                                    <label for="exp_paramname"
+                                           class="col-sm-2 control-label exp_paramname">{{ item | safe }}</label>
+                                    <div class="col-sm-10">
+                                        <input type="text" class="form-control  " name={{ item | safe }}>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+
+-->
+
+                        <div class="form-group">
+                            <div class="col-sm-offset-2 col-sm-10">
+                                <button type="submit" class="btn btn-success btn-block do_add">走你</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block js %}
+    <script src="{{ buildStaticUrl('/js/case/addcase.js') }}"></script>
+    <script src="https://cdn.staticfile.org/jquery/1.10.2/jquery.min.js"></script>
+    <script src="{{ buildStaticUrl('/js/case/jquery.jsonview.js') }}"></script>
+    <script src="{{ buildStaticUrl('/js/case/jquery.jsonview.css') }}"></script>
+
+
+
+{% endblock %}

@@ -1,0 +1,111 @@
+{% extends "/common/layout.html" %}
+
+{% block content %}
+    <div>
+        <button onclick="addRow();">+</button>
+{#        <button onclick="zhanyong();">申请占用</button>#}
+{#        <button onclick="zhanyong_release();">解除占用</button>#}
+        <button id="btn-gen" onclick="generateScript();">生成脚本</button>
+        <a id="switch" href="http://192.168.0.129:8089" hidden="hidden">跳转</a>
+    </div>
+
+    <table border="1" cellspacing="0" width="1300" style="margin-top: 10px">
+        <thead>
+        <th>编号</th>
+        <th>请求地址</th>
+        <th>请求方式:post/get</th>
+        <th>入参类型:data/json</th>
+        <th>请求头:没有填{}</th>
+        <th>入参:没有填{}</th>
+        <th>断言:没有填{}</th>
+        <th>权重:数字</th>
+        </thead>
+
+        <tbody id="urls">
+        <tr>
+            <td>1</td>
+            <td class="stress" contenteditable="true" width="200"></td>
+            <td class="stress" contenteditable="true"></td>
+            <td class="stress" contenteditable="true"></td>
+            <td class="stress" contenteditable="true"></td>
+            <td class="stress" contenteditable="true"></td>
+            <td class="stress" contenteditable="true"></td>
+            <td class="stress" contenteditable="true"></td>
+        </tr>
+        </tbody>
+
+    </table>
+{% endblock %}
+
+{% block js %}
+    <script src="https://cdn.staticfile.org/jquery/1.10.2/jquery.min.js"></script>
+    <script src="{{ buildStaticUrl('/js/stress/stressTest.js') }}"></script>
+{% endblock %}
+
+{#<head>#}
+{#    <meta charset="UTF-8">#}
+{#    <title>Title</title>#}
+{#    <script src="https://cdn.staticfile.org/jquery/1.10.2/jquery.min.js"></script>#}
+{#    <style>#}
+{#        .stress {#}
+{#            max-height: 20px;#}
+{#            max-width: 500px;#}
+{#            overflow: hidden;#}
+{#        }#}
+{#    </style>#}
+{##}
+{##}
+{##}
+{##}
+{##}
+{#</head>#}
+{##}
+{##}
+{##}
+{#<body>#}
+{##}
+{#<div>#}
+{#    <div>#}
+{#        <button onclick="addRow();">+</button>#}
+{#        <button onclick="zhanyong();">申请占用</button>#}
+{#        <button onclick="zhanyong_release();">解除占用</button>#}
+{#        <button id="btn-gen" onclick="generateScript();"  hidden="hidden">生成脚本</button>#}
+{#        <a id="switch" href="http://192.168.0.129:8089" hidden="hidden">跳转</a>#}
+{#    </div>#}
+{##}
+{#    <table border="1" cellspacing="0" width="1300" style="margin-top: 10px">#}
+{#        <thead>#}
+{#        <th>编号</th>#}
+{#        <th>请求地址</th>#}
+{#        <th>请求方式:post/get</th>#}
+{#        <th>入参类型:data/json</th>#}
+{#        <th>请求头:没有填{}</th>#}
+{#        <th>入参:没有填{}</th>#}
+{#        <th>断言:没有填{}</th>#}
+{#        <th>权重:数字</th>#}
+{#        </thead>#}
+{#        #}
+{#        <tbody>#}
+{#        <tr>#}
+{#            <td>1</td>#}
+{#            <td class="stress" contenteditable="true" width="200"></td>#}
+{#            <td class="stress" contenteditable="true"></td>#}
+{#            <td class="stress" contenteditable="true"></td>#}
+{#            <td class="stress" contenteditable="true"></td>#}
+{#            <td class="stress" contenteditable="true"></td>#}
+{#            <td class="stress" contenteditable="true"></td>#}
+{#            <td class="stress" contenteditable="true"></td>#}
+{#        </tr>#}
+{#        </tbody>#}
+{##}
+{#    </table>#}
+{##}
+{##}
+{#</div>#}
+{##}
+{##}
+{#<script src="/static/js/stressTest.js"></script>#}
+{##}
+{##}
+{#</body>#}
+{#</html>#}

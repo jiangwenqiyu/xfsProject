@@ -1,0 +1,52 @@
+{% extends "/common/layout.html" %}
+{% block content %}
+    <div class="form-horizontal test_wrap ">
+    <div class="panel panel-success col-md-12">
+        <div class="panel-body">
+        <div class="row">
+            <div class="col-md-2 col-md-offset-8">
+         <button type="submit" class="btn btn-success btn-block do-select col-md-1" >选中执行</button>
+            </div>
+            <div class="col-md-2 pull-right">
+         <button type="submit" class="btn btn-success btn-block do-alltest col-md-3" >全部执行</button>
+            </div>
+        </div>
+            {% if data %}
+                {% for item in data %}
+                    <div class="form-horizontal param_wrap ">
+                    <div class="panel panel-success col-md-12">
+                        <div class="panel-body">
+                            <div class="input-group " >
+                                         <span class="input-group-addon " >
+                                             <input type="checkbox" aria-label="..." name="choose" value={{ item.case_id | safe }}>
+                                         </span>
+                                <div class="list-group">
+                                    <a href="{{ '%s?case_id=%s' | format(buildUrl('/case/editcase'),item.case_id) }}" class="list-group-item">
+
+                                        <h4 class="list-group-item-heading ">{{ item.case_data | safe }}</h4>
+                                        <p style="display: none" class="allcase">{{ item.case_id | safe }}</p>
+                                        <p class="list-group-item-text {{ item.case_id | safe }} " id="case_id">用例ID：{{ item.case_id | safe }}</p>
+                                        <p class="list-group-item-text">用例说明：{{ item.explain | safe }}</p>
+                                        <div class="row">
+
+                                        </div>
+                                    </a>
+                                    <div class="pull-right">
+                                        <button type="submit" class="btn btn-success btn-block do-test" name={{ item.case_id | safe }}>测试</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+            </div>
+        </div>
+    </div>
+    </div>
+
+{% endblock %}
+{% block js %}
+    <script src="{{ buildStaticUrl('/js/case/dotest.js') }}"></script>
+
+{% endblock %}
