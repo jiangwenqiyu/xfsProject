@@ -93,7 +93,7 @@ def generate(urls):
 
     print(word)
 
-    with open('./scripts/stress.py', 'w') as f:
+    with open('/data/xfs_testplatform/xfsProject/scripts/stress.py', 'w') as f:
         f.write(word)
 
 
