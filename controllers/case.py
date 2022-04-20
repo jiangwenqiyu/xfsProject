@@ -13,6 +13,7 @@ from interceptors.Auth import check_login
 from common.libs.requery import requery
 from testmain import run
 from testmain import runway
+import copy
 
 case_page = Blueprint("case", __name__)
 
@@ -288,10 +289,10 @@ def addcase():
                 for x in range(calc-1):
                     tab += '\t'
                 # print('{}{}-{}'.format(tab, key, type(data[key])))  # 打印键
-                li.append('{}--{}'.format(key, calc))
+                li.append('{}-{}--{}'.format(key, str(type(data[key])).replace('<class ', '').replace('>', ''), calc))
 
                 if isinstance(data[key], dict):  # 判断这个键的值，是否还是字典或列表，是的话继续递归,不是的话，打印当前键，看下一个键
-                    digui(data[key], calc, li)
+                    digui(data[key], calc + 1, li)
                 elif isinstance(data[key], list):
                     digui(data[key], calc, li)
                 else:
@@ -319,10 +320,33 @@ def addcase():
     li = []
     digui(eval(param),1, li)
     param = li
-    print(li)
+    # print(li, '**************************')
+
+    li = []
+    real_li = []
+    for i in param:
+        # 先把字段存入li
+        li.append(i)
+        # 深拷贝li，反转
+        temp = copy.deepcopy(li)
+        temp.reverse()
+        # 判断是否是1级，是的话直接存入real
+        if i.split('--')[1] == '1':
+            real_li.append(i.split('--')[0])
+        # 否则取深拷贝层级，与当前层级最近的dict，为父字段   （父） 当前字段
+        else:
+            for x in temp:
+                # if 'dict' in x and x.split('--')[1] != i.split('--')[1]:
+                if x.split('--')[1] != i.split('--')[1]:
+                    real_li.append('<strong style="color: red">({})</strong> {}'.format(x.split('--')[0], i.split('--')[0]))
+                    break
+    param = real_li
+
+
 
 
 
     pjlist = info.remarks.split(",")
     exp_param = info.exp_parameter.split(",")
     return ops_render('case/taddcase.html', {"info": info, "param": param, "exp_param": exp_param, "pjlist": pjlist})
+

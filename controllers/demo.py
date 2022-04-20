@@ -22,7 +22,7 @@ def digui(data, calc, li):
             li.append('{}{}-{}'.format(tab, key, type(data[key])))
 
             if isinstance(data[key], dict):  # 判断这个键的值，是否还是字典或列表，是的话继续递归,不是的话，打印当前键，看下一个键
-                digui(data[key], calc, li)
+                digui(data[key], calc + 1, li)
             elif isinstance(data[key], list):
                 digui(data[key], calc, li)
             else:
@@ -76,9 +76,15 @@ a = {
     "c": "经销商品",
     "d": "17063",
     "e": "2100003037",
-    'f':{'a':123}
+    'f':{'xa':123, 'xb':{'fuck':789}}
 }
 
 digui(a, 1, li)
 
 print(li)
+
+
+
+a = [0,1,2,3,4]
+b = a.pop(-1)
+print(b)
