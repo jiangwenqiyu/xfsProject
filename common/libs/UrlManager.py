@@ -5,7 +5,7 @@ class UrlManager(object):
     @staticmethod
     def buildUrl(path):
         config_domain = app.config['DOMAIN']
-        return "%s%s"%(config_domain['www'],path)
+        return "%s%s"%(config_domain['shengchan'],path)
 
     @staticmethod
     def buildStaticUrl(path):

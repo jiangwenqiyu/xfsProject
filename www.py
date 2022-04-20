@@ -9,6 +9,9 @@ from flask_debugtoolbar import DebugToolbarExtension
 toolbar = DebugToolbarExtension(app)
 from interceptors.Auth import *
 from interceptors.errorHandler import *
+
+
+
 #注册蓝图，首层路径设置
 app.register_blueprint(member_page,url_prefix="/member")
 app.register_blueprint(index_page, url_prefix="/")
