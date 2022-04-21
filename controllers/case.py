@@ -8,12 +8,16 @@ from common.models.supplier import Supplier
 from common.models.suppliercase import SupplierCase
 from common.models.coordination import Coordination
 from common.models.coordinationcase import CoordinationCase
+from common.models.system_info import SystemInfo
+from common.models.func_info import FuncInfo
+from common.models.auth_map import AuthMap
 from common.libs.helper import ops_render
 from interceptors.Auth import check_login
 from common.libs.requery import requery
 from testmain import run
 from testmain import runway
-import copy
+from sqlalchemy.sql import and_
+
 
 case_page = Blueprint("case", __name__)
 
@@ -117,10 +121,76 @@ def mylist():
     if is_login == False:
         return ops_render('member/login.html')
 
-    info = CoordinationCase.query.filter_by(user_id=is_login.user_id)
+    # 根据映射表，查询用户的一级模块权限
+    info = db.session.query(SystemInfo).join(AuthMap, and_(SystemInfo.id==AuthMap.system_id, AuthMap.user_id==is_login.user_id))
     if not info:
         return redirect(UrlManager.UrlManager.buildUrl("/case_list"))
-    return ops_render('case/my_list_bak.html', {"data": info})
+    return ops_render('case/my_list_bak.html', {'data':info})
+
+# @case_page.route("/ttt", methods=["GET"])
+# def ttt():
+#     info = db.session.query(SystemInfo, AuthMap.user_id).join(AuthMap, SystemInfo.id==AuthMap.system_id)
+#     print(info, '***************************')
+#     for ii in info:
+#         print(dir(ii), 'xxxxxxxxxxxxxxxxx000000000000000xxxxxxxxxxxxx')
+#
+#
+#     if not info:
+#         return redirect(UrlManager.UrlManager.buildUrl("/case_list"))
+#     return ops_render('case/my_list_bak.html', {'data':info})
+
+
+
+@case_page.route("/getSecondContent", methods=["POST"])
+def getSecondContent():
+    # 根据映射表，查询用户的二级模块权限
+    is_login = check_login()
+    if is_login == False:
+        return ops_render('member/login.html')
+
+    req = request.get_json()
+    system_id = req['system_id']
+
+    info = FuncInfo.query.join(AuthMap, and_(FuncInfo.id==AuthMap.func_id, AuthMap.user_id==is_login.user_id)).filter_by(system_id=system_id)
+    if not info:
+        return redirect(UrlManager.UrlManager.buildUrl("/case_list"))
+
+    data = []
+    for i in info:
+        temp = dict()
+        temp['id'] = i.id
+        temp['name'] = i.name
+        data.append(temp)
+
+    return jsonify(status='0', data=data)
+
+@case_page.route("/getThirdContent", methods=["POST"])
+def getThirdContent():
+    is_login = check_login()
+    if is_login == False:
+        return ops_render('member/login.html')
+
+    req = request.get_json()
+    func_id = req['func_id']
+
+    info = CoordinationCase.query.filter_by(user_id=is_login.user_id, func_id = func_id)
+    if not info:
+        return redirect(UrlManager.UrlManager.buildUrl("/case_list"))
+
+    data = []
+    for i in info:
+        temp = dict()
+        temp['case_id'] = i.case_id
+        temp['case_data'] = i.case_data
+        temp['expected_results'] = i.expected_results
+        temp['apiname'] = i.apiname
+        temp['ispj'] = i.ispj
+        temp['remarks'] = i.remarks
+        temp['explain'] = i.explain
+        data.append(temp)
+
+    return jsonify(status='0', data=data)
+
 
 
 

@@ -1,14 +1,107 @@
 {% extends "/common/layout.html" %}
 {% block content %}
     <div id="first" style="float: left">
-    123
+    <ul>
+        {% for i in data %}
+        <li>
+            <a href="#" f-id="{{ i.id }}" onclick="getSecondContent(this)">   {{ i.name }}   </a>
+        </li>
+        {% endfor %}
+    </ul>
     </div>
 
-    <div id="second" style="float: left">
-    456
+    <div id="second" style="float: left;margin-left: 20px">
+    <ul>
+    </ul>
     </div>
 
-    <div id="third" style="float: left">
-        789
+
+    <div id="third" style="float: left; margin-left: 20px">
+
     </div>
+
+
+
+    <script>
+        function getSecondContent(obj) {
+            // 先清空二级的ul
+            $('#second').children('ul').html('');
+            // 清空三级
+            $('#third').html('');
+            fid = $(obj).attr('f-id');
+            $.ajax({
+                url: '/case/getSecondContent',
+                type: 'post',
+                contentType: 'application/json',
+                dataType: 'json',
+                data: JSON.stringify({'system_id':fid}),
+                success: function (resp) {
+                    // 请求成功后，加载二级模块
+                    for (x in resp.data) {
+                        $('#second').children('ul').append('<li><a href="#" onclick="getThirdContent(this)" s-id=' + resp.data[x].id + '>' + resp.data[x].name + '</a></li>')
+                    }
+
+                }
+
+            })
+        }
+
+        function getThirdContent(obj) {
+            // 先清空三级的内容
+            $('#third').html('');
+            sid = $(obj).attr('s-id');
+            $.ajax({
+                url: '/case/getThirdContent',
+                type: 'post',
+                contentType: 'application/json',
+                dataType: 'json',
+                data: JSON.stringify({'func_id':sid}),
+                success: function (resp) {
+                    // 请求成功后，加载三级模块
+                    for (x in resp.data) {
+                        case_id = resp.data[x].case_id
+                        case_data = resp.data[x].case_data
+                        explain = resp.data[x].explain
+
+                        var content = '<div class="form-horizontal param_wrap ">'
+                        content += '<div class="panel panel-success col-md-12">'
+                        content += '<div class="panel-body">'
+                        content += '<div class="input-group " >'
+                        content += '<span class="input-group-addon " >'
+                        content += '<input type="checkbox" aria-label="..." name="choose" value=' + case_id + '>'
+                        content += '</span>'
+                        content += '<div class="list-group">'
+                        content += '<a href="/case/editcase?case_id=' + case_id + '" class="list-group-item">'
+                        content += '<h4 class="list-group-item-heading ">' + case_data + '</h4>'
+                        content += '<p style="display: none" class="allcase">' + case_id + '</p>'
+                        content += '<p class="list-group-item-text ' + case_id + ' " id="case_id">用例ID：' + case_id + '</p>'
+                        content += '<p class="list-group-item-text">用例说明：' + explain + '</p>'
+                        content += '<div class="row">'
+                        content += '</div>'
+                        content += '</a>'
+                        content += '<div class="pull-right">'
+                        content += '<button type="submit" class="btn btn-success btn-block do-test" name=' + case_id +  '>测试</button>'
+                        content += '</div>'
+                        content += '</div>'
+                        content += '</div>'
+                        content += '</div>'
+
+
+
+
+                        $('#third').append(content);
+                    }
+
+                }
+
+            })
+        }
+
+
+
+
+
+    </script>
+
 {% endblock %}
+
