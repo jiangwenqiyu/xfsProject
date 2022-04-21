@@ -48,12 +48,10 @@ def create_json():
     app.logger.info("res")
     app.logger.info(res)
 
-   # res = jsonify(jsons)
     return json.dumps({"data":res},ensure_ascii=False)
-   # return render_template('case/taddcase.html', **json)
 
 
-@case_page.route("/addcase", methods=["GET", "POST"])
+# @case_page.route("/addcase", methods=["GET", "POST"])
 def addcase():
     is_login = check_login()
     if is_login == False:
@@ -70,6 +68,28 @@ def addcase():
     exp_param = info.exp_parameter.split(",")
     print(pjlist)
     return ops_render('case/taddcase.html', {"info": info, "param": param, "exp_param": exp_param, "pjlist": pjlist})
+
+
+@case_page.route("/addcase", methods=["GET", "POST"])
+def addcase():
+    is_login = check_login()
+    if is_login == False:
+        return ops_render('member/login.html')
+    req = request.values
+    id = int(req['id']) if ('id' in req and req['id']) else 0
+    if id < 1:
+        return redirect(UrlManager.UrlManager.buildUrl("/case_list"))
+    info = Coordination.query.filter_by(id=id).first()
+    if not info:
+        return redirect(UrlManager.UrlManager.buildUrl("/case_list"))
+
+    param = info.param.split(",")
+    pjlist = info.remarks.split(",")
+    exp_param = []
+    print(pjlist)
+    return ops_render('case/taddcase.html', {"info": info, "param": param, "exp_param": exp_param, "pjlist": pjlist})
+
+
 
 
 @case_page.route("/do_add", methods=["GET", "POST"])
@@ -122,7 +142,7 @@ def mylist():
         return ops_render('member/login.html')
 
     # 根据映射表，查询用户的一级模块权限
-    info = db.session.query(SystemInfo).join(AuthMap, and_(SystemInfo.id==AuthMap.system_id, AuthMap.user_id==is_login.user_id))
+    info = SystemInfo.query.all()
     if not info:
         return redirect(UrlManager.UrlManager.buildUrl("/case_list"))
     return ops_render('case/my_list_bak.html', {'data':info})
@@ -151,7 +171,7 @@ def getSecondContent():
     req = request.get_json()
     system_id = req['system_id']
 
-    info = FuncInfo.query.join(AuthMap, and_(FuncInfo.id==AuthMap.func_id, AuthMap.user_id==is_login.user_id, FuncInfo.system_id==system_id))
+    info = FuncInfo.query.filter_by(system_id=system_id)
 
     if not info:
         return redirect(UrlManager.UrlManager.buildUrl("/case_list"))
@@ -279,11 +299,12 @@ def do_addmodel():
         return ops_render('member/login.html')
     req = request.values
     apiname = req['apiname'] if 'apiname' in req else ""
-    route = req['route'] if 'route' in req else ""
-    parameter = req['parameter'] if 'parameter' in req else ""
-    exp_parameter = req['exp_parameter'] if 'exp_parameter' in req else ""
-    method = req['method'] if 'method' in req else ""
     explain = req['explain'] if 'explain' in req else ""
+    route = req['route'] if 'route' in req else ""
+    method = req['method'] if 'method' in req else ""
+    param = req['param'] if 'param' in req else ""
+    data = req['data'] if 'data' in req else ""
+    dataType = req['dataType'] if 'dataType' in req else ""
 
     if apiname is None or len(apiname) < 1:
         return helper.ops_renderErrJSON(msg="接口名称是必填项")
@@ -295,12 +316,22 @@ def do_addmodel():
         return helper.ops_renderErrJSON(msg="中文解释是必填项")
 
     modle_addmodel= Coordination()
-    modle_addmodel.route = route
     modle_addmodel.apiname = apiname
-    modle_addmodel.parameter = parameter
-    modle_addmodel.exp_parameter = exp_parameter
-    modle_addmodel.method = method
     modle_addmodel.explain = explain
+    modle_addmodel.route = route
+    modle_addmodel.method = method
+    modle_addmodel.param = param
+    modle_addmodel.data = data
+    modle_addmodel.dataType = dataType
+
+    print(req)
+    print(apiname)
+    print(explain)
+    print(route)
+    print(method)
+    print(param)
+    print(data)
+    print(dataType)
 
     db.session.add(modle_addmodel)
     db.session.commit()
