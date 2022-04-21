@@ -151,7 +151,8 @@ def getSecondContent():
     req = request.get_json()
     system_id = req['system_id']
 
-    info = FuncInfo.query.join(AuthMap, and_(FuncInfo.id==AuthMap.func_id, AuthMap.user_id==is_login.user_id)).filter_by(system_id=system_id)
+    info = FuncInfo.query.join(AuthMap, and_(FuncInfo.id==AuthMap.func_id, AuthMap.user_id==is_login.user_id, FuncInfo.system_id==system_id))
+
     if not info:
         return redirect(UrlManager.UrlManager.buildUrl("/case_list"))
 
