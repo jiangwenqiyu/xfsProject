@@ -79,12 +79,17 @@ a = {
     'f':{'xa':123, 'xb':{'fuck':789}}
 }
 
-digui(a, 1, li)
+# digui(a, 1, li)
+#
+# print(li)
 
-print(li)
+a = [1,2,3,4,5,6]
+print(a[0:1])
 
 
 
-a = [0,1,2,3,4]
-b = a.pop(-1)
-print(b)
+
+
+
+
+

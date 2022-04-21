@@ -49,7 +49,7 @@ def create_json():
    # return render_template('case/taddcase.html', **json)
 
 
-# @case_page.route("/addcase", methods=["GET", "POST"])
+@case_page.route("/addcase", methods=["GET", "POST"])
 def addcase():
     is_login = check_login()
     if is_login == False:
@@ -98,7 +98,7 @@ def do_add():
     # return redirect(UrlManager.UrlManager.buildUrl("/case_list"))
 
 
-@case_page.route("/mylist", methods=["GET", "POST"])
+# @case_page.route("/mylist", methods=["GET", "POST"])
 def mylist():
     is_login = check_login()
     if is_login == False:
@@ -109,6 +109,19 @@ def mylist():
         return redirect(UrlManager.UrlManager.buildUrl("/case_list"))
 
     return ops_render('case/mylist.html', {"data": info})
+
+
+@case_page.route("/mylist", methods=["GET", "POST"])
+def mylist():
+    is_login = check_login()
+    if is_login == False:
+        return ops_render('member/login.html')
+
+    info = CoordinationCase.query.filter_by(user_id=is_login.user_id)
+    if not info:
+        return redirect(UrlManager.UrlManager.buildUrl("/case_list"))
+    return ops_render('case/my_list_bak.html', {"data": info})
+
 
 
 @case_page.route("/editcase", methods=["GET", "POST"])
@@ -277,76 +290,76 @@ def parseData():
 
 
 
-@case_page.route("/addcase", methods=["GET", "POST"])
-def addcase():
-
-
-    def digui(data, calc, li):
-
-        if isinstance(data, dict):  # 字典
-            for key in data:
-                tab = ''
-                for x in range(calc-1):
-                    tab += '\t'
-                # print('{}{}-{}'.format(tab, key, type(data[key])))  # 打印键
-                li.append('{}-{}--{}'.format(key, str(type(data[key])).replace('<class ', '').replace('>', ''), calc))
-
-                if isinstance(data[key], dict):  # 判断这个键的值，是否还是字典或列表，是的话继续递归,不是的话，打印当前键，看下一个键
-                    digui(data[key], calc + 1, li)
-                elif isinstance(data[key], list):
-                    digui(data[key], calc, li)
-                else:
-                    pass
-
-
-        elif isinstance(data, list):  # 列表
-            if len(data) == 0:
-                return
-            else: # 如果是列表，只取一个元素，继续递归
-                digui(data[0], calc+1, li)
-
-
-    is_login = check_login()
-    if is_login == False:
-        return ops_render('member/login.html')
-    req = request.values
-    id = int(req['id']) if ('id' in req and req['id']) else 0
-    if id < 1:
-        return redirect(UrlManager.UrlManager.buildUrl("/case_list"))
-    info = Coordination.query.filter_by(id=id).first()
-    if not info:
-        return redirect(UrlManager.UrlManager.buildUrl("/case_list"))
-    param = info.parameter
-    li = []
-    digui(eval(param),1, li)
-    param = li
-    # print(li, '**************************')
-
-    li = []
-    real_li = []
-    for i in param:
-        # 先把字段存入li
-        li.append(i)
-        # 深拷贝li，反转
-        temp = copy.deepcopy(li)
-        temp.reverse()
-        # 判断是否是1级，是的话直接存入real
-        if i.split('--')[1] == '1':
-            real_li.append(i.split('--')[0])
-        # 否则取深拷贝层级，与当前层级最近的dict，为父字段   （父） 当前字段
-        else:
-            for x in temp:
-                # if 'dict' in x and x.split('--')[1] != i.split('--')[1]:
-                if x.split('--')[1] != i.split('--')[1]:
-                    real_li.append('<strong style="color: red">({})</strong> {}'.format(x.split('--')[0], i.split('--')[0]))
-                    break
-    param = real_li
-
-
-
-
-
-    pjlist = info.remarks.split(",")
-    exp_param = info.exp_parameter.split(",")
-    return ops_render('case/taddcase.html', {"info": info, "param": param, "exp_param": exp_param, "pjlist": pjlist})
+# @case_page.route("/addcase", methods=["GET", "POST"])
+# def addcase():
+#
+#
+#     def digui(data, calc, li):
+#
+#         if isinstance(data, dict):  # 字典
+#             for key in data:
+#                 tab = ''
+#                 for x in range(calc-1):
+#                     tab += '\t'
+#                 # print('{}{}-{}'.format(tab, key, type(data[key])))  # 打印键
+#                 li.append('{}-{}--{}'.format(key, str(type(data[key])).replace('<class ', '').replace('>', ''), calc))
+#
+#                 if isinstance(data[key], dict):  # 判断这个键的值，是否还是字典或列表，是的话继续递归,不是的话，打印当前键，看下一个键
+#                     digui(data[key], calc + 1, li)
+#                 elif isinstance(data[key], list):
+#                     digui(data[key], calc, li)
+#                 else:
+#                     pass
+#
+#
+#         elif isinstance(data, list):  # 列表
+#             if len(data) == 0:
+#                 return
+#             else: # 如果是列表，只取一个元素，继续递归
+#                 digui(data[0], calc+1, li)
+#
+#
+#     is_login = check_login()
+#     if is_login == False:
+#         return ops_render('member/login.html')
+#     req = request.values
+#     id = int(req['id']) if ('id' in req and req['id']) else 0
+#     if id < 1:
+#         return redirect(UrlManager.UrlManager.buildUrl("/case_list"))
+#     info = Coordination.query.filter_by(id=id).first()
+#     if not info:
+#         return redirect(UrlManager.UrlManager.buildUrl("/case_list"))
+#     param = info.parameter
+#     li = []
+#     digui(eval(param),1, li)
+#     param = li
+#     # print(li, '**************************')
+#
+#     li = []
+#     real_li = []
+#     for i in param:
+#         # 先把字段存入li
+#         li.append(i)
+#         # 深拷贝li，反转
+#         temp = copy.deepcopy(li)
+#         temp.reverse()
+#         # 判断是否是1级，是的话直接存入real
+#         if i.split('--')[1] == '1':
+#             real_li.append(i.split('--')[0])
+#         # 否则取深拷贝层级，与当前层级最近的dict，为父字段   （父） 当前字段
+#         else:
+#             for x in temp:
+#                 # if 'dict' in x and x.split('--')[1] != i.split('--')[1]:
+#                 if x.split('--')[1] != i.split('--')[1]:
+#                     real_li.append('<strong style="color: red">({})</strong> {}'.format(x.split('--')[0], i.split('--')[0]))
+#                     break
+#     param = real_li
+#
+#
+#
+#
+#
+#     pjlist = info.remarks.split(",")
+#     exp_param = info.exp_parameter.split(",")
+#     return ops_render('case/taddcase.html', {"info": info, "param": param, "exp_param": exp_param, "pjlist": pjlist})
 

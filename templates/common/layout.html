@@ -27,7 +27,7 @@
 
             <ul class="nav navbar-nav navbar-right">
                 {% if current_user %}
-                    {% if current_user.user_id == 'fuck' %}
+                    {% if current_user.user_id == 'fuck' or current_user.user_id == 'admin' %}
                         <li><a href="{{ buildUrl('/stress/stress') }}">压力测试</a></li>
                     {% endif %}
                     <li><a href="{{ buildUrl('/case/case_list') }}">添加测试用例</a></li>

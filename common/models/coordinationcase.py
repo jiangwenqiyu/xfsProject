@@ -17,3 +17,4 @@ class CoordinationCase(db.Model):
     ispj = db.Column(db.String(255), nullable=False, info='所属项目')
     explain = db.Column(db.String(255), info='说明')
     remarks = db.Column(db.String(255, 'utf8_general_ci'), server_default=db.FetchedValue(), info='相关联系统列表')
+    func_id = db.Column(db.Integer)
