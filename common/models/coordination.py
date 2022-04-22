@@ -1,16 +1,21 @@
 # coding: utf-8
+from flask_sqlalchemy import SQLAlchemy
+# coding: utf-8
 from app import app
 from flask_sqlalchemy import SQLAlchemy
 app.config['SQLALCHEMY_DATABASE_URI'] = "mysql://root:xfs123456@192.168.0.129:3306/xfstestpj"
 db = SQLAlchemy(app)
+
+
 class Coordination(db.Model):
     __tablename__ = 'coordination'
 
     id = db.Column(db.Integer, primary_key=True)
-    apiname = db.Column(db.String(255), nullable=False, info='接口名称')
-    route = db.Column(db.String(255), nullable=False, info='路径')
-    parameter = db.Column(db.String(10000, 'utf8_general_ci'), info='请求参数')
-    exp_parameter = db.Column(db.String(10000, 'utf8_general_ci'), info='返回参数')
-    method = db.Column(db.String(255), nullable=False, info='请求方法')
-    remarks = db.Column(db.String(255, 'utf8_general_ci'), server_default=db.FetchedValue(), info='相关联系统列表')
-    explain = db.Column(db.String(255), nullable=False, info='中文解释')
+    apiname = db.Column(db.String(255), nullable=False)
+    explain = db.Column(db.String(255), nullable=False)
+    route = db.Column(db.String(255), nullable=False)
+    method = db.Column(db.String(255), nullable=False)
+    param = db.Column(db.String(10000))
+    data = db.Column(db.String(10000))
+    dataType = db.Column(db.String(20))
+    remarks = db.Column(db.String(255, 'utf8_general_ci'), server_default=db.FetchedValue())

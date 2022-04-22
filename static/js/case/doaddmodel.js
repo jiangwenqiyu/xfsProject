@@ -12,11 +12,14 @@ var member_reg_ops = {
                 return;
             }
             var apiname = $(".addmodel_wrap input[name = apiname]").val();
-            var route = $(".addmodel_wrap input[name = route]").val();
-            var parameter = $(".addmodel_wrap input[name = parameter]").val();
-            var exp_parameter = $(".addmodel_wrap input[name = exp_parameter]").val();
-            var method = $(".addmodel_wrap input[name = method]").val();
             var explain = $(".addmodel_wrap input[name = explain]").val();
+            var route = $(".addmodel_wrap input[name = route]").val();
+            var method = $(".addmodel_wrap input[name = method]").val();
+            var param = $(".addmodel_wrap input[name = param]").val();
+            var data = $(".addmodel_wrap input[name = data]").val();
+            var dataType = $(".addmodel_wrap input[name = dataType]").val();
+
+
             if (apiname == "undefined" || apiname.length < 1) {
                 common_ops.alert("接口名称是必填项")
                 return;
@@ -41,15 +44,15 @@ var member_reg_ops = {
                 type: "POST",
                 data: {
                     apiname: apiname,
-                    route: route,
-                    parameter: parameter,
-                    exp_parameter: exp_parameter,
-                    method: method,
                     explain: explain,
+                    route: route,
+                    method: method,
+                    param: param,
+                    data: data,
+                    dataType: dataType
 
 
                 },
-                dataType: 'json',
                 success: function (res) {
                     btn_target.removeClass("disabled");
                     var callback = null;

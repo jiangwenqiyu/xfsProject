@@ -60,8 +60,9 @@
                     // 请求成功后，加载三级模块
                     for (x in resp.data) {
                         case_id = resp.data[x].case_id
-                        case_data = resp.data[x].case_data
+                        case_data = JSON.stringify(resp.data[x].case_data)
                         explain = resp.data[x].explain
+                        apiname = resp.data[x].apiname
 
                         var content = '<div class="form-horizontal param_wrap ">'
                         content += '<div class="panel panel-success col-md-12">'
@@ -72,7 +73,7 @@
                         content += '</span>'
                         content += '<div class="list-group">'
                         content += '<a href="/case/editcase?case_id=' + case_id + '" class="list-group-item">'
-                        content += '<h4 class="list-group-item-heading ">' + case_data + '</h4>'
+                        content += '<h4 class="list-group-item-heading ">' + apiname + '</h4>'
                         content += '<p style="display: none" class="allcase">' + case_id + '</p>'
                         content += '<p class="list-group-item-text ' + case_id + ' " id="case_id">用例ID：' + case_id + '</p>'
                         content += '<p class="list-group-item-text">用例说明：' + explain + '</p>'

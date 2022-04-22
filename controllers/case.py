@@ -83,41 +83,60 @@ def addcase():
     if not info:
         return redirect(UrlManager.UrlManager.buildUrl("/case_list"))
 
-    param = info.param.split(",")
     pjlist = info.remarks.split(",")
-    exp_param = []
-    print(pjlist)
-    return ops_render('case/taddcase.html', {"info": info, "param": param, "exp_param": exp_param, "pjlist": pjlist})
+    # param = json.loads(info.param)
+    # data = json.loads(info.data)
+    param = info.param
+    data = info.data
+    url = info.route
+
+    return ops_render('case/taddcase.html', {"param": param,'data':data, "pjlist": pjlist, 'info':info, 'url':url})
 
 
 
 
 @case_page.route("/do_add", methods=["GET", "POST"])
 def do_add():
+    is_login = check_login()
+    if is_login == False:
+        return ops_render('member/login.html')
+
     if request.method == "GET":
         return ops_render("case/case_list")
-    req = request.values
-    apiname = req['apiname'] if 'apiname' in req else ""
-    param = req['param'] if 'param' in req else ""
-    user_id = req['user_id'] if 'user_id' in req else ""
-    exp_param = req['expparam'] if 'expparam' in req else ""
-    pjname = req['pjname'] if 'pjname' in req else ""
-    explain = req['explain'] if 'explain' in req else ""
+
+    req = request.get_json()
+    user_id = is_login.user_id
+    route = req['route']
+    param = json.loads(req['param'])
+    data = json.loads(req['data'])
+    exp = json.loads(req['exp'])
+    explain = req['explain']
+    apiname = req['apiname']
+    func_id = req['func_id']
+
+
+    # pjname = req['pjname'] if 'pjname' in req else ""
+
 
     try:
         modle_addcase = CoordinationCase()
-        modle_addcase.user_id = check_login().user_id
+        modle_addcase.route = route
+        modle_addcase.case_data = data
+        modle_addcase.expected_results = exp
         modle_addcase.apiname = apiname
-        modle_addcase.case_data = param
-        modle_addcase.expected_results = exp_param
-        modle_addcase.ispj = pjname
         modle_addcase.explain = explain
+        modle_addcase.func_id = func_id
+        modle_addcase.ispj = '123'
+        modle_addcase.user_id = user_id
+        modle_addcase.param = param
         db.session.add(modle_addcase)
         db.session.commit()
         db.session.close()
-    except BaseException:
-        print(BaseException)
+    except Exception as e:
+        print(e)
+        return helper.ops_renderErrJSON(msg="提交失败了我擦")
     else:
+        # return jsonify(msg='success')
         return helper.ops_renderJSON(msg="提交成功")
     # return redirect(UrlManager.UrlManager.buildUrl("/case_list"))
 
@@ -199,12 +218,19 @@ def getThirdContent():
         return redirect(UrlManager.UrlManager.buildUrl("/case_list"))
 
     data = []
+
     for i in info:
         temp = dict()
         temp['case_id'] = i.case_id
+        route = i.route
+        if route == None or route == '':
+            temp['apiname'] = ''
+        else:
+            temp['apiname'] = i.route.split('/')[-1]
+
         temp['case_data'] = i.case_data
         temp['expected_results'] = i.expected_results
-        temp['apiname'] = i.apiname
+        # temp['apiname'] = i.apiname
         temp['ispj'] = i.ispj
         temp['remarks'] = i.remarks
         temp['explain'] = i.explain
@@ -229,8 +255,10 @@ def editcase():
         return redirect(UrlManager.UrlManager.buildUrl("/case/mylist"))
 
     #  case_data = info.case_data.split(",")
-    expected_results = json.loads(info.expected_results)
-    case_data = json.loads(info.case_data)
+    param = json.dumps(info.param)
+    expected_results = json.dumps(info.expected_results)
+    case_data = json.dumps(info.case_data)
+    explain = info.explain
 
     pjlist = info.remarks.split(",")
     app.logger.info("pjlist")
@@ -242,7 +270,7 @@ def editcase():
     app.logger.info(pjlist)
     app.logger.info(case_data)
     return ops_render('case/editcase.html',
-                      {"info": info, "case_data": case_data, "expected_results": expected_results, "pjlist": pjlist})
+                      {"info": info, "explain":explain, "param":param, "case_data": case_data, "expected_results": expected_results, "pjlist": pjlist})
 
 
 '''
@@ -257,31 +285,24 @@ def reg():
 def do_edit():
     if request.method == "GET":
         return ops_render("case/mylist.html")
-    req = request.values
-    apiname = req['apiname'] if 'apiname' in req else ""
-    param = req['param'] if 'param' in req else ""
-    case_id = req['case_id'] if 'case_id' in req else ""
-    exp_param = req['expparam'] if 'expparam' in req else ""
-    pjname = req['pjname'] if 'pjname' in req else ""
-    explain = req['explain'] if 'explain' in req else ""
+    req = request.get_json()
 
-    app.logger.info(check_login().user_id)
-    app.logger.info("check_login().user_id")
+    caseid = req['caseid']
+    param = req['param']
+    data = req['data']
+    asser = req['assert']
+    explain = req['explain']
 
-    modle_addcase = CoordinationCase()
-    user = modle_addcase.query.filter_by(case_id=case_id).first()
-    user.user_id = check_login().user_id
-    user.apiname = apiname
-    user.case_data = param
-    user.expected_results = exp_param
-    user.ispj = pjname
-    user.explain = explain
-    # db.session.add(user)
+    temp = dict()
+    temp['case_data'] = json.loads(data)
+    temp['param'] = json.loads(param)
+    temp['expected_results'] = json.loads(asser)
+    temp['explain'] = explain
+    db.session.query(CoordinationCase).filter_by(case_id=caseid).update(temp)
     db.session.commit()
-    # db.session.close()
+
 
     return helper.ops_renderJSON(msg="提交成功")
-    # return redirect(UrlManager.UrlManager.buildUrl("/case_list"))
 
 
 @case_page.route("/addmodel", methods=["GET", "POST"])
