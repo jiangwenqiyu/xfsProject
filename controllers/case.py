@@ -90,7 +90,7 @@ def addcase():
     data = info.data
     url = info.route
 
-    return ops_render('case/taddcase.html', {"param": param,'data':data, "pjlist": pjlist, 'info':info, 'url':url})
+    return ops_render('case/taddcase.html', {"param": param,'data':data, "pjlist": pjlist, 'info':info, 'url':url, 'id':id})
 
 
 
@@ -113,6 +113,7 @@ def do_add():
     explain = req['explain']
     apiname = req['apiname']
     func_id = req['func_id']
+    coordinationId = req['coordinationId']
 
 
     # pjname = req['pjname'] if 'pjname' in req else ""
@@ -129,6 +130,7 @@ def do_add():
         modle_addcase.ispj = '123'
         modle_addcase.user_id = user_id
         modle_addcase.param = param
+        modle_addcase.coordination_id = coordinationId
         db.session.add(modle_addcase)
         db.session.commit()
         db.session.close()
@@ -361,128 +363,55 @@ def do_addmodel():
     return helper.ops_renderJSON(msg="提交成功")
 
 
-@case_page.route("/parseData", methods=["GET", "POST"])
-def parseData():
-    def getInfo(obj, temp):
-        if isinstance(obj, dict):
-            for k in obj:
-                if isinstance(obj[k], dict):
-                    t = dict()
-                    tt = list()
-                    tt = getInfo(obj[k], tt)
-                    t[k] = tt
-                    temp.append(t)
-                elif isinstance(obj[k], list) and len(obj[k]) != 0 and isinstance(obj[k][0], dict):
-                    t = dict()
-                    tt = list()
-                    tt = getInfo(obj[k][0], tt)
-                    t[k] = tt
-                    temp.append(t)
 
-                else:
-                    temp.append(k)
 
-            return temp
+# 执行测试用例
+@case_page.route('/exeCases', methods=['POST'])
+def exeCases():
+    '''
+    接收参数：[用例id]
+    :return:
+    '''
+    is_login = check_login()
+    if is_login == False:
+        return ops_render('member/login.html')
 
-        elif isinstance(obj, list) and len(obj) != 0 and isinstance(obj[0], dict):
-            for k in obj[0]:
-                if isinstance(obj[0][k], dict):
-                    t = dict()
-                    tt = list()
-                    tt = getInfo(obj[0][k], tt)
-                    t[k] = tt
-                    temp.append(t)
-                elif isinstance(obj[0][k], list) and len(obj[0][k]) != 0 and isinstance(obj[0][k][0], dict):
-                    t = dict()
-                    tt = list()
-                    tt = getInfo(obj[0][k][0], tt)
-                    t[k] = tt
-                    temp.append(t)
+    import threading
+    from exeCase.run import RunPyTest
+    req = request.get_json()
+    caseids = req['caseids']  # 已经排好序的
+    # info = CoordinationCase.query.join(Coordination, Coordination.id==CoordinationCase.coordination_id).add_entity(Coordination).filter(CoordinationCase.case_id.in_(caseids)).all()
+    info = db.session.query(CoordinationCase.case_id, CoordinationCase.route,CoordinationCase.param,CoordinationCase.case_data,CoordinationCase.expected_results, Coordination.method,Coordination.dataType).join(Coordination, Coordination.id==CoordinationCase.coordination_id).filter(CoordinationCase.case_id.in_(caseids)).all()
+    caseDict = dict()
+    for i in info:
+        print(info)
+        print(i.method)
+        temp = dict()
+        temp['route'] = i.route
+        temp['param'] = i.param
+        temp['case_data'] = i.case_data
+        temp['expected_results'] = i.expected_results
+        temp['method'] = i.method
+        temp['dataType'] = i.dataType
+        caseDict[i.case_id] = temp
 
-                else:
-                    temp.append(k)
+    # 把用例进行排序
+    caseOrder = list()
+    for caseid in caseids:
+        caseOrder.append(caseDict[caseid])
 
-            return temp
+    # 启动新的线程执行测试用例
+    obj = RunPyTest(is_login.user_id, caseOrder)
+    t = threading.Thread(target=obj.run)
+    t.start()
 
-    c = Coordination.query.all()
-    p = eval(c[4].parameter)
-    a = getInfo(p, [])
-    for i in a:
-        print(i)
-    return jsonify(sta = a)
+    return jsonify(msg='OK')
 
 
 
-# @case_page.route("/addcase", methods=["GET", "POST"])
-# def addcase():
-#
-#
-#     def digui(data, calc, li):
-#
-#         if isinstance(data, dict):  # 字典
-#             for key in data:
-#                 tab = ''
-#                 for x in range(calc-1):
-#                     tab += '\t'
-#                 # print('{}{}-{}'.format(tab, key, type(data[key])))  # 打印键
-#                 li.append('{}-{}--{}'.format(key, str(type(data[key])).replace('<class ', '').replace('>', ''), calc))
-#
-#                 if isinstance(data[key], dict):  # 判断这个键的值，是否还是字典或列表，是的话继续递归,不是的话，打印当前键，看下一个键
-#                     digui(data[key], calc + 1, li)
-#                 elif isinstance(data[key], list):
-#                     digui(data[key], calc, li)
-#                 else:
-#                     pass
-#
-#
-#         elif isinstance(data, list):  # 列表
-#             if len(data) == 0:
-#                 return
-#             else: # 如果是列表，只取一个元素，继续递归
-#                 digui(data[0], calc+1, li)
-#
-#
-#     is_login = check_login()
-#     if is_login == False:
-#         return ops_render('member/login.html')
-#     req = request.values
-#     id = int(req['id']) if ('id' in req and req['id']) else 0
-#     if id < 1:
-#         return redirect(UrlManager.UrlManager.buildUrl("/case_list"))
-#     info = Coordination.query.filter_by(id=id).first()
-#     if not info:
-#         return redirect(UrlManager.UrlManager.buildUrl("/case_list"))
-#     param = info.parameter
-#     li = []
-#     digui(eval(param),1, li)
-#     param = li
-#     # print(li, '**************************')
-#
-#     li = []
-#     real_li = []
-#     for i in param:
-#         # 先把字段存入li
-#         li.append(i)
-#         # 深拷贝li，反转
-#         temp = copy.deepcopy(li)
-#         temp.reverse()
-#         # 判断是否是1级，是的话直接存入real
-#         if i.split('--')[1] == '1':
-#             real_li.append(i.split('--')[0])
-#         # 否则取深拷贝层级，与当前层级最近的dict，为父字段   （父） 当前字段
-#         else:
-#             for x in temp:
-#                 # if 'dict' in x and x.split('--')[1] != i.split('--')[1]:
-#                 if x.split('--')[1] != i.split('--')[1]:
-#                     real_li.append('<strong style="color: red">({})</strong> {}'.format(x.split('--')[0], i.split('--')[0]))
-#                     break
-#     param = real_li
-#
-#
-#
-#
-#
-#     pjlist = info.remarks.split(",")
-#     exp_param = info.exp_parameter.split(",")
-#     return ops_render('case/taddcase.html', {"info": info, "param": param, "exp_param": exp_param, "pjlist": pjlist})
+
+
+
+
+
 
