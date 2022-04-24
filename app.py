@@ -1,5 +1,5 @@
 #变量
-from flask import Flask
+from flask import Flask, render_template
 from flask_script import Manager
 from flask_sqlalchemy import SQLAlchemy
 
@@ -17,4 +17,8 @@ db = SQLAlchemy(app)
 app.logger.info("================")
 
 
+
+@app.route('/viewreport')
+def viewreport():
+    return render_template(r'/data/xfs_testplatform/xfsProject/exeCase/testReport/admin/report/index.html')
 
