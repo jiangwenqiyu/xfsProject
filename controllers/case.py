@@ -407,7 +407,28 @@ def exeCases():
 
     return jsonify(msg='OK')
 
+# testb = Blueprint('web', __name__, template_folder='./exeCase/testReport/admin/report')
+# testb = Blueprint('web', __name__)
 
+# 查看测试报告
+@case_page.route('/viewReport', methods=['GET'])
+def viewReport():
+    is_login = check_login()
+    if is_login == False:
+        return ops_render('member/login.html')
+
+
+
+    # 配置主页面
+    html = './exeCase/testReport/{}/report/index.html'.format(is_login.user_id)
+    # with open(html, 'r') as f:
+    #     file = f.read()
+    #
+    # file = file.replace('Allure Report', '鑫方盛测试报告')
+    # file = file.replace('<link rel="stylesheet" href="css/styles.css">', '<link rel="stylesheet" href="./exeCase/testReport/{}/report/style.css">'.format(is_login.user_id))
+
+
+    return render_template(r'/data/xfs_testplatform/xfsProject/exeCase/testReport/admin/report/reportindex.html')
 
 
 
