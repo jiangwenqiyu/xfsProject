@@ -14,6 +14,12 @@ class RunPyTest:
 
 
     def run(self):
+        # 创建报告目录
+        if os.path.exists('./exeCase/testReport'):
+            pass
+        else:
+            os.mkdir('./exeCase/testReport')
+
         # 根据用户，创建用户自己的报告目录
         if os.path.exists('./exeCase/testReport/{}'.format(self.userid)):
             pass
