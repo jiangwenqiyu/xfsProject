@@ -428,7 +428,7 @@ def viewReport():
     # file = file.replace('<link rel="stylesheet" href="css/styles.css">', '<link rel="stylesheet" href="./exeCase/testReport/{}/report/style.css">'.format(is_login.user_id))
 
 
-    return render_template(r'/data/xfs_testplatform/xfsProject/exeCase/testReport/admin/report/reportindex.html')
+    return render_template(r'/data/xfs_testplatform/xfsProject/exeCase/testReport/admin/report/index.html')
 
 
 
