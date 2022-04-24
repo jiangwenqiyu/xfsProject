@@ -15,30 +15,30 @@ class RunPyTest:
 
     def run(self):
         # 创建报告目录
-        if os.path.exists('./exeCase/testReport'):
+        if os.path.exists('./static/reports'):
             pass
         else:
-            os.mkdir('./exeCase/testReport')
+            os.mkdir('./static/reports')
 
         # 根据用户，创建用户自己的报告目录
-        if os.path.exists('./exeCase/testReport/{}'.format(self.userid)):
+        if os.path.exists('./static/reports/{}'.format(self.userid)):
             pass
         else:
-            os.mkdir('./exeCase/testReport/{}'.format(self.userid))
+            os.mkdir('./static/reports/{}'.format(self.userid))
 
         # 判断用户下是否有临时allure目录
-        if os.path.exists('./exeCase/testReport/{}/report_temp'.format(self.userid)):
+        if os.path.exists('./static/reports/{}/report_temp'.format(self.userid)):
             pass
         else:
-            os.mkdir('./exeCase/testReport/{}/report_temp'.format(self.userid))
+            os.mkdir('./static/reports/{}/report_temp'.format(self.userid))
 
-        if os.path.exists('./exeCase/testReport/{}/report'.format(self.userid)):
+        if os.path.exists('./static/reports/{}/report'.format(self.userid)):
             pass
         else:
-            os.mkdir('./exeCase/testReport/{}/report'.format(self.userid))
+            os.mkdir('./static/reports/{}/report'.format(self.userid))
 
-        tempdir = './exeCase/testReport/{}/report_temp'.format(self.userid)
-        reportdir = './exeCase/testReport/{}/report'.format(self.userid)
+        tempdir = './static/reports/{}/report_temp'.format(self.userid)
+        reportdir = './static/reports/{}/report'.format(self.userid)
 
         pytest.main(['-vs', './exeCase/testcases.py', '--alluredir', '{}'.format(tempdir) ])
         os.system('allure generate {} -o {} -c {}'.format(tempdir, reportdir, reportdir))
