@@ -12,7 +12,6 @@ class RunPyTest:
     def __init__(self, userid, caseInfos):
         PyConfig.caseInfos = caseInfos
         self.userid = userid
-        print(PyConfig.caseInfos, '**********************************************', len(PyConfig.caseInfos))
 
 
     def run(self):
