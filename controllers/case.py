@@ -384,8 +384,6 @@ def exeCases():
     info = db.session.query(CoordinationCase.case_id, CoordinationCase.route,CoordinationCase.param,CoordinationCase.case_data,CoordinationCase.expected_results, Coordination.method,Coordination.dataType).join(Coordination, Coordination.id==CoordinationCase.coordination_id).filter(CoordinationCase.case_id.in_(caseids)).all()
     caseDict = dict()
     for i in info:
-        print(info)
-        print(i.method)
         temp = dict()
         temp['route'] = i.route
         temp['param'] = i.param
@@ -418,10 +416,6 @@ def viewReport():
     if is_login == False:
         return ops_render('member/login.html')
 
-
-
-    # 配置主页面
-    html = './exeCase/testReport/{}/report/index.html'.format(is_login.user_id)
 
     info = {'user_id':is_login.user_id}
     return ops_render(r'/reports/index.html', info)
