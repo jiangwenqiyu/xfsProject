@@ -407,8 +407,8 @@ def exeCases():
 
     return jsonify(msg='OK')
 
-# testb = Blueprint('web', __name__, template_folder='./exeCase/testReport/admin/report')
-# testb = Blueprint('web', __name__)
+
+
 
 # 查看测试报告
 @case_page.route('/viewReport', methods=['GET'])
