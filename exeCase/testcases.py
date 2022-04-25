@@ -10,6 +10,7 @@ class Test1:
 
     @pytest.mark.parametrize('caseInfo', PyConfig.caseInfos)
     def test_run(self, caseInfo):
+        print(PyConfig.caseInfos, '**********************************************', len(PyConfig.caseInfos))
         header = {}
         url = caseInfo['route']
         data = caseInfo['case_data']
