@@ -46,7 +46,7 @@ class RunPyTest:
         tempdir = './static/reports/{}/report_temp'.format(self.userid)
         reportdir = './static/reports/{}/report'.format(self.userid)
 
-        pytest.main(['-vs', './exeCase/testcases.py', '--alluredir', '{}'.format(tempdir) ])
+        pytest.main(['-vs', './exeCase/testcases.py', '--alluredir', '{}'.format(tempdir), '--cache-clear' ])
         os.system('allure generate {} -o {} -c {}'.format(tempdir, reportdir, reportdir))
 
 
