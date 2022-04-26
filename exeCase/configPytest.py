@@ -18,7 +18,6 @@ class RunPyTest:
         self.userid = userid
         PyConfig.caseInfos = caseInfos
 
-        os.system('cd /data/xfs_testplatform/xfsProject')
         # 创建报告目录
         if os.path.exists('./static/reports'):
             pass

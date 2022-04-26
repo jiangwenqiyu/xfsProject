@@ -400,6 +400,10 @@ def exeCases():
     for caseid in caseids:
         caseOrder.append(caseDict[caseid])
 
+    import os
+    print(os.getcwd())
+    return
+
     # 启动新的线程执行测试用例
     obj = RunPyTest()
     t = multiprocessing.Process(target=obj.run, args=(is_login.user_id, caseOrder))
