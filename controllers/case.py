@@ -1,6 +1,6 @@
 # coding=utf-8
 import json
-
+import os
 from app import app, db
 from flask import Blueprint, request, redirect, g, jsonify, render_template
 from common.libs import helper, UrlManager
@@ -400,13 +400,11 @@ def exeCases():
     for caseid in caseids:
         caseOrder.append(caseDict[caseid])
 
-    import os
-    print(os.getcwd())
-    return jsonify(name='hellp')
 
     # 启动新的线程执行测试用例
+    path = os.getcwd()
     obj = RunPyTest()
-    t = multiprocessing.Process(target=obj.run, args=(is_login.user_id, caseOrder))
+    t = multiprocessing.Process(target=obj.run, args=(is_login.user_id, caseOrder, path))
     # t = threading.Thread(target=obj.run, args=(is_login.user_id, caseOrder))
     t.start()
 
