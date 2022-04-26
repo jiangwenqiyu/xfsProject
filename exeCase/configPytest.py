@@ -17,8 +17,8 @@ class RunPyTest:
     def run(self, userid, caseInfos):
         self.userid = userid
         PyConfig.caseInfos = caseInfos
-
-
+        import os
+        print(os.getcwd())
         # 创建报告目录
         if os.path.exists('./static/reports'):
             pass
