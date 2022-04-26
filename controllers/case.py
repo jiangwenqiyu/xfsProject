@@ -17,6 +17,9 @@ from common.libs.requery import requery
 from testmain import run
 from testmain import runway
 from sqlalchemy.sql import and_
+import threading
+from exeCase.configPytest import RunPyTest
+import multiprocessing
 
 
 case_page = Blueprint("case", __name__)
@@ -376,8 +379,7 @@ def exeCases():
     if is_login == False:
         return ops_render('member/login.html')
 
-    import threading
-    from exeCase.run import RunPyTest
+
     req = request.get_json()
     caseids = req['caseids']  # 已经排好序的
     # info = CoordinationCase.query.join(Coordination, Coordination.id==CoordinationCase.coordination_id).add_entity(Coordination).filter(CoordinationCase.case_id.in_(caseids)).all()
@@ -399,8 +401,9 @@ def exeCases():
         caseOrder.append(caseDict[caseid])
 
     # 启动新的线程执行测试用例
-    obj = RunPyTest(is_login.user_id, caseOrder)
-    t = threading.Thread(target=obj.run)
+    obj = RunPyTest()
+    t = multiprocessing.Process(target=obj.run, args=(is_login.user_id, caseOrder))
+    # t = threading.Thread(target=obj.run, args=(is_login.user_id, caseOrder))
     t.start()
 
     return jsonify(msg='OK')

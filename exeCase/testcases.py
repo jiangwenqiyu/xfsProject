@@ -1,6 +1,6 @@
 import pytest
 import allure
-from exeCase.run import PyConfig
+from exeCase.configPytest import PyConfig
 import requests
 import jmespath
 
@@ -10,7 +10,8 @@ class Test1:
 
     @pytest.mark.parametrize('caseInfo', PyConfig.caseInfos)
     def test_run(self, caseInfo):
-        print(PyConfig.caseInfos, '**********************************************', len(PyConfig.caseInfos))
+        print(id(PyConfig.caseInfos), '****', PyConfig.caseInfos)
+        return 0
         header = {}
         url = caseInfo['route']
         data = caseInfo['case_data']

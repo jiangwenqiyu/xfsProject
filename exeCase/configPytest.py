@@ -2,26 +2,28 @@ import os
 import pytest
 import shutil
 
+
 class PyConfig:
-    caseInfos = None
+    caseInfos = []
 
 
 
 class RunPyTest:
 
-    def __init__(self, userid, caseInfos):
-        PyConfig.caseInfos = caseInfos
+    def __init__(self):
+        self.userid = None
+
+
+    def run(self, userid, caseInfos):
         self.userid = userid
+        PyConfig.caseInfos = caseInfos
 
 
-    def run(self):
         # 创建报告目录
         if os.path.exists('./static/reports'):
             pass
         else:
             os.mkdir('./static/reports')
-
-
 
         # 根据用户，创建用户自己的报告目录.如果有历史数据，先删除历史数据
         if os.path.exists('./static/reports/{}'.format(self.userid)):
@@ -45,10 +47,8 @@ class RunPyTest:
 
         tempdir = './static/reports/{}/report_temp'.format(self.userid)
         reportdir = './static/reports/{}/report'.format(self.userid)
-
-        pytest.main(['-vs', './exeCase/testcases.py', '--alluredir', '{}'.format(tempdir), '--cache-clear' ])
+        pytest.main(['-vs',  './exeCase/testcases.py', '--alluredir', '{}'.format(tempdir) ])
         os.system('allure generate {} -o {} -c {}'.format(tempdir, reportdir, reportdir))
-
 
 
 
