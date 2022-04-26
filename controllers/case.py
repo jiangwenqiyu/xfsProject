@@ -402,7 +402,7 @@ def exeCases():
 
     import os
     print(os.getcwd())
-    return
+    return jsonify(name='hellp')
 
     # 启动新的线程执行测试用例
     obj = RunPyTest()
