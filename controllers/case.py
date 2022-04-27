@@ -404,7 +404,7 @@ def exeCases():
     # 启动新的线程执行测试用例
     path = os.getcwd()
     print(path, '******************')
-    return
+    return jsonify(ret='haha')
     obj = RunPyTest()
     t = multiprocessing.Process(target=obj.run, args=(is_login.user_id, caseOrder, path))
     # t = threading.Thread(target=obj.run, args=(is_login.user_id, caseOrder))
