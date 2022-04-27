@@ -400,11 +400,11 @@ def exeCases():
     for caseid in caseids:
         caseOrder.append(caseDict[caseid])
 
-
     # 启动新的线程执行测试用例
-    path = os.getcwd()
-    print(path, '******************')
-    return jsonify(ret='haha')
+    path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+    # print(path, '******************')
+    # return jsonify(ret='haha')
+
     obj = RunPyTest()
     t = multiprocessing.Process(target=obj.run, args=(is_login.user_id, caseOrder, path))
     # t = threading.Thread(target=obj.run, args=(is_login.user_id, caseOrder))
