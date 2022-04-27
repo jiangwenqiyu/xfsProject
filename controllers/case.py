@@ -383,16 +383,20 @@ def exeCases():
     req = request.get_json()
     caseids = req['caseids']  # 已经排好序的
     # info = CoordinationCase.query.join(Coordination, Coordination.id==CoordinationCase.coordination_id).add_entity(Coordination).filter(CoordinationCase.case_id.in_(caseids)).all()
-    info = db.session.query(CoordinationCase.case_id, CoordinationCase.route,CoordinationCase.param,CoordinationCase.case_data,CoordinationCase.expected_results, Coordination.method,Coordination.dataType).join(Coordination, Coordination.id==CoordinationCase.coordination_id).filter(CoordinationCase.case_id.in_(caseids)).all()
+    info = db.session.query(CoordinationCase.case_id, CoordinationCase.func_id, CoordinationCase.explain, CoordinationCase.route,CoordinationCase.param,CoordinationCase.case_data,CoordinationCase.expected_results, Coordination.method,Coordination.dataType).join(Coordination, Coordination.id==CoordinationCase.coordination_id).filter(CoordinationCase.case_id.in_(caseids)).all()
     caseDict = dict()
     for i in info:
         temp = dict()
+        temp['case_id'] = i.case_id
+        temp['func_id'] = i.func_id
         temp['route'] = i.route
         temp['param'] = i.param
         temp['case_data'] = i.case_data
         temp['expected_results'] = i.expected_results
         temp['method'] = i.method
         temp['dataType'] = i.dataType
+        temp['explain'] = i.explain
+
         caseDict[i.case_id] = temp
 
     # 把用例进行排序
