@@ -50,13 +50,16 @@ class RunPyTest:
         pytest.main(['-vs',  '{}/exeCase/testcases.py'.format(path), '--alluredir', '{}'.format(tempdir) ])
         # os.system('allure generate {} -o {} -c {}'.format(tempdir, reportdir, reportdir))
 
-        # 执行完之后，请求内部接口，生成测试报告
-        url = 'http://192.168.0.129:7890/case/generateReport'
-        # url = 'http://127.0.0.1:5000/case/generateReport'
-        data = {'user_id': self.userid,'path': path}
-        res = requests.post(url, json=data).json()
-        print(res)
+        # # 执行完之后，请求内部接口，生成测试报告
+        # url = 'http://192.168.0.129:7890/case/generateReport'
+        # # url = 'http://127.0.0.1:5000/case/generateReport'
+        # data = {'user_id': self.userid,'path': path}
+        # res = requests.post(url, json=data).json()
+        # print(res)
+        #
 
+        # 执行完之后，执行shell，生成报告
+        os.system('{}/report.sh {}'.format(path, self.userid))
 
 
 

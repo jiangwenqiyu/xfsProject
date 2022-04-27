@@ -1,0 +1,1 @@
+allure generate ./static/reports/$1/report_temp -o ./static/reports/$1/report -c ./static/reports/$1/report
