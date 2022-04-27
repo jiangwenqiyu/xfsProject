@@ -423,7 +423,9 @@ def generateReport():
     '''
     req = request.get_json()
     user_id = req['user_id']
-    os.system('allure generate ./static/reports/{}/report_temp -o ./static/reports/{}/report -c ./static/reports/{}/report'.format(user_id, user_id, user_id))
+    path = 'allure generate ./static/reports/{}/report_temp -o ./static/reports/{}/report -c ./static/reports/{}/report'.format(user_id, user_id, user_id)
+    os.system(path)
+    print(path)
 
     return jsonify(msg = '生成报告成功')
 
