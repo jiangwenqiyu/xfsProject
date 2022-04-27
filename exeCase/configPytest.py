@@ -22,7 +22,7 @@ class RunPyTest:
         if os.path.exists('{}/static/reports'.format(path)):
             pass
         else:
-            os.mkdir('{}/static/reports')
+            os.mkdir('{}/static/reports'.format(path))
 
         # 根据用户，创建用户自己的报告目录.如果有历史数据，先删除历史数据
         if os.path.exists('{}/static/reports/{}'.format(path, self.userid)):
@@ -48,6 +48,9 @@ class RunPyTest:
         reportdir = '{}/static/reports/{}/report'.format(path, self.userid)
         pytest.main(['-vs',  '{}/exeCase/testcases.py'.format(path), '--alluredir', '{}'.format(tempdir) ])
         os.system('allure generate {} -o {} -c {}'.format(tempdir, reportdir, reportdir))
+
+
+
 
 
 
