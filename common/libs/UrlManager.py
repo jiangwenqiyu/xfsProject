@@ -5,11 +5,13 @@ class UrlManager(object):
     @staticmethod
     def buildUrl(path):
         config_domain = app.config['DOMAIN']
-        return "%s%s"%(config_domain['shengchan'],path)
+        return "%s%s"%(config_domain['www'],path)
 
     @staticmethod
     def buildStaticUrl(path):
         path = "/static" + path+"?ver="+UrlManager.getReleaseVersion()
+        app.logger.info("css")
+        app.logger.info(path)
         return UrlManager.buildUrl(path)
 
 #如果找到RELEASE_PATH所在版本文件，则不在进行js版本更新，显示版本文件内版本号,用于版本发布管理，开发环境使用时间戳进行js更新
