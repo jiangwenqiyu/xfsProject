@@ -18,9 +18,9 @@ $('.do_add').click(function () {
     exp = $("#assert").text();
     explain = $("#explain").val();
     apiname = $(".apiname").attr("apiname");
-    func_id = 1;
+    func_id = $("#funcid").val();
+    alert(func_id);
     coordinationId = $(".apiname").attr("coordinationId");
-
     $.ajax({
         url: '/case/do_add',
         type: 'post',
