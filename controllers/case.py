@@ -413,26 +413,6 @@ def exeCases():
     return jsonify(msg='OK')
 
 
-# 内部调用接口，生成测试报告
-@case_page.route('/generateReport', methods=['POST'])
-def generateReport():
-    '''
-    解决多进程，在linux找不到allure命令的情况
-    接收参数：用户id
-    :return:
-    '''
-    req = request.get_json()
-    user_id = req['user_id']
-    # path = req['path']
-    # outputDir = 'allure generate {}/static/reports/{}/report_temp -o {}/static/reports/{}/report -c {}/static/reports/{}/report'.format(path, user_id, path, user_id, path, user_id)
-
-    outputDir = 'allure generate ./static/reports/{}/report_temp -o ./static/reports/{}/report -c ./static/reports/{}/report'.format(user_id, user_id, user_id)
-    os.system(outputDir)
-    print(outputDir)
-
-    return jsonify(msg = '生成报告成功')
-
-
 
 
 # 查看测试报告
