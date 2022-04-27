@@ -53,7 +53,7 @@ class RunPyTest:
         # 执行完之后，请求内部接口，生成测试报告
         url = 'http://192.168.0.129:7890/case/generateReport'
         # url = 'http://127.0.0.1:5000/case/generateReport'
-        data = {'user_id': self.userid}
+        data = {'user_id': self.userid,'path': path}
         res = requests.post(url, json=data).json()
         print(res)
 
