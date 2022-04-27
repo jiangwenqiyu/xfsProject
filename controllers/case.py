@@ -423,8 +423,10 @@ def generateReport():
     '''
     req = request.get_json()
     user_id = req['user_id']
-    path = req['path']
-    outputDir = 'allure generate {}/static/reports/{}/report_temp -o {}/static/reports/{}/report -c {}/static/reports/{}/report'.format(path, user_id, path, user_id, path, user_id)
+    # path = req['path']
+    # outputDir = 'allure generate {}/static/reports/{}/report_temp -o {}/static/reports/{}/report -c {}/static/reports/{}/report'.format(path, user_id, path, user_id, path, user_id)
+
+    outputDir = 'allure generate ./static/reports/{}/report_temp -o ./static/reports/{}/report -c ./static/reports/{}/report'.format(user_id, user_id, user_id)
     os.system(outputDir)
     print(outputDir)
 

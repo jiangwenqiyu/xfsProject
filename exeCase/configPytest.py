@@ -48,7 +48,7 @@ class RunPyTest:
         tempdir = '{}/static/reports/{}/report_temp'.format(path, self.userid)
         reportdir = '{}/static/reports/{}/report'.format(path, self.userid)
         pytest.main(['-vs',  '{}/exeCase/testcases.py'.format(path), '--alluredir', '{}'.format(tempdir) ])
-        os.system('/data/autoTest/productCenter/package/bin/allure generate {} -o {} -c {}'.format(tempdir, reportdir, reportdir))
+        # os.system('/data/autoTest/productCenter/package/bin/allure generate {} -o {} -c {}'.format(tempdir, reportdir, reportdir))
 
         # # 执行完之后，请求内部接口，生成测试报告
         # url = 'http://192.168.0.129:7890/case/generateReport'
