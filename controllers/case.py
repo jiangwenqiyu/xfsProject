@@ -115,7 +115,6 @@ def do_add():
     exp = json.loads(req['exp'])
     explain = req['explain']
     apiname = req['apiname']
-    func_id = req['func_id']
     coordinationId = req['coordinationId']
 
 
@@ -129,7 +128,6 @@ def do_add():
         modle_addcase.expected_results = exp
         modle_addcase.apiname = apiname
         modle_addcase.explain = explain
-        modle_addcase.func_id = func_id
         modle_addcase.ispj = '123'
         modle_addcase.user_id = user_id
         modle_addcase.param = param
@@ -216,9 +214,21 @@ def getThirdContent():
         return ops_render('member/login.html')
 
     req = request.get_json()
-    func_id = req['func_id']
 
-    info = CoordinationCase.query.filter_by(user_id=is_login.user_id, func_id = func_id)
+    # info = CoordinationCase.query.filter_by(user_id=is_login.user_id, func_id = func_id)
+    info = db.session.query(CoordinationCase.case_id,
+                            CoordinationCase.user_id,
+                            CoordinationCase.apiname,
+                            CoordinationCase.case_data,
+                            CoordinationCase.expected_results,
+                            CoordinationCase.ispj,
+                            CoordinationCase.remarks,
+                            CoordinationCase.explain,
+                            CoordinationCase.route
+                            ).join(Coordination, and_(CoordinationCase.coordination_id==Coordination.id,
+                                                      CoordinationCase.user_id==is_login.user_id,
+                                                      Coordination.func_id == req['func_id']
+                                                      )).all()
     if not info:
         return redirect(UrlManager.UrlManager.buildUrl("/case_list"))
 
@@ -331,6 +341,7 @@ def do_addmodel():
     param = req['param'] if 'param' in req else ""
     data = req['data'] if 'data' in req else ""
     dataType = req['dataType'] if 'dataType' in req else ""
+    func_id = req['func_id'] if 'func_id' in req else ""
 
     if apiname is None or len(apiname) < 1:
         return helper.ops_renderErrJSON(msg="接口名称是必填项")
@@ -340,6 +351,14 @@ def do_addmodel():
         return helper.ops_renderErrJSON(msg="请求方法是必填项")
     if explain is None or len(explain) < 1:
         return helper.ops_renderErrJSON(msg="中文解释是必填项")
+    if param is None or len(param) < 1:
+        return helper.ops_renderErrJSON(msg="param参数是必填项")
+    if data is None or len(data) < 1:
+        return helper.ops_renderErrJSON(msg="入参是必填项,没有填空")
+    if dataType is None or len(dataType) < 1:
+        return helper.ops_renderErrJSON(msg="入参类型是必填项,没有入参的话，随便填一个")
+    if func_id is None or len(func_id) < 1:
+        return helper.ops_renderErrJSON(msg="功能模块id是必填项")
 
     modle_addmodel= Coordination()
     modle_addmodel.apiname = apiname
@@ -349,15 +368,7 @@ def do_addmodel():
     modle_addmodel.param = param
     modle_addmodel.data = data
     modle_addmodel.dataType = dataType
-
-    print(req)
-    print(apiname)
-    print(explain)
-    print(route)
-    print(method)
-    print(param)
-    print(data)
-    print(dataType)
+    modle_addmodel.func_id = func_id
 
     db.session.add(modle_addmodel)
     db.session.commit()
@@ -383,12 +394,21 @@ def exeCases():
     req = request.get_json()
     caseids = req['caseids']  # 已经排好序的
     # info = CoordinationCase.query.join(Coordination, Coordination.id==CoordinationCase.coordination_id).add_entity(Coordination).filter(CoordinationCase.case_id.in_(caseids)).all()
-    info = db.session.query(CoordinationCase.case_id, CoordinationCase.func_id, CoordinationCase.explain, CoordinationCase.route,CoordinationCase.param,CoordinationCase.case_data,CoordinationCase.expected_results, Coordination.method,Coordination.dataType).join(Coordination, Coordination.id==CoordinationCase.coordination_id).filter(CoordinationCase.case_id.in_(caseids)).all()
+    info = db.session.query(CoordinationCase.case_id,
+                            CoordinationCase.coordination_id,
+                            CoordinationCase.explain,
+                            CoordinationCase.route,
+                            CoordinationCase.param,
+                            CoordinationCase.case_data,
+                            CoordinationCase.expected_results,
+                            Coordination.method,
+                            Coordination.dataType).join(Coordination, Coordination.id==CoordinationCase.coordination_id).filter(CoordinationCase.case_id.in_(caseids)).all()
     caseDict = dict()
     for i in info:
         temp = dict()
+        print(i.case_id,'*********')
         temp['case_id'] = i.case_id
-        temp['func_id'] = i.func_id
+        temp['coordination_id'] = i.coordination_id
         temp['route'] = i.route
         temp['param'] = i.param
         temp['case_data'] = i.case_data
@@ -401,8 +421,11 @@ def exeCases():
 
     # 把用例进行排序
     caseOrder = list()
-    for caseid in caseids:
-        caseOrder.append(caseDict[caseid])
+    try:
+        for caseid in caseids:
+            caseOrder.append(caseDict[caseid])
+    except:
+        return jsonify(msg='id不存在,{}'.format(caseid))
 
     # 启动新的线程执行测试用例
     path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
