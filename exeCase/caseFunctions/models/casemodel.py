@@ -11,8 +11,9 @@ from common.commonFunctions import Common
 from allure_commons._allure import Dynamic
 
 
+
 @allure.feature("测试模块")
-class Test1:
+class Test:
 
     # @allure.story('')
     @pytest.mark.parametrize('caseInfo', PyConfig.caseInfos)
@@ -66,5 +67,4 @@ class Test1:
                     assert False, '断言获取字段失败\n断言表达式:{}\n返回的值:{}'.format(pat, res.text)
 
                 assert exp_value == fact_value, '\n断言失败\n断言表达式::{}\n期望值:{}\n实际结果:{}'.format(pat, exp_value, fact_value)
-
 

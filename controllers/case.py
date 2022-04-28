@@ -2,7 +2,7 @@
 import json
 import os
 from app import app, db
-from flask import Blueprint, request, redirect, g, jsonify, render_template
+from flask import Blueprint, request, redirect, g, jsonify, make_response
 from common.libs import helper, UrlManager
 from common.models.supplier import Supplier
 from common.models.suppliercase import SupplierCase
@@ -380,8 +380,8 @@ def do_addmodel():
 
 
 # 执行测试用例
-@case_page.route('/exeCases', methods=['POST'])
-def exeCases():
+# @case_page.route('/exeCases', methods=['POST'])
+def exeCases_bak():
     '''
     接收参数：[用例id]
     :return:
@@ -440,19 +440,91 @@ def exeCases():
     return jsonify(msg='OK')
 
 
+@case_page.route('/exeCases', methods=['POST'])
+def exeCases():
+    '''
+    接收参数：[{"func_id":1,"case":[排序好的用例id]}]
+    :return:
+    '''
+    is_login = check_login()
+    if is_login == False:
+        return ops_render('member/login.html')
+
+
+    req = request.get_json()
+
+    finalData = dict()
+    for obj in req['caseids']:
+        caseids = obj['case']   # 已经排好序的
+        s = obj['func_id']
+        i = FuncInfo.query.filter_by(id=obj['func_id']).first()
+        func_name = i.name
+
+        info = db.session.query(CoordinationCase.case_id,
+                                CoordinationCase.coordination_id,
+                                CoordinationCase.explain,
+                                CoordinationCase.route,
+                                CoordinationCase.param,
+                                CoordinationCase.case_data,
+                                CoordinationCase.expected_results,
+                                Coordination.method,
+                                Coordination.dataType
+                                ).join(Coordination, Coordination.id==CoordinationCase.coordination_id).filter(CoordinationCase.case_id.in_(caseids)).all()
+        caseDict = dict()
+        for i in info:
+            temp = dict()
+            temp['case_id'] = i.case_id
+            temp['coordination_id'] = i.coordination_id
+            temp['route'] = i.route
+            temp['param'] = i.param
+            temp['case_data'] = i.case_data
+            temp['expected_results'] = i.expected_results
+            temp['method'] = i.method
+            temp['dataType'] = i.dataType
+            temp['explain'] = i.explain
+
+            caseDict[i.case_id] = temp
+
+        # 把用例进行排序
+        caseOrder = list()
+        try:
+            for caseid in caseids:
+                caseOrder.append(caseDict[caseid])
+        except:
+            return jsonify(msg='id不存在,{}'.format(caseid))
+        else:
+            # 排序之后存入返回变量 [{"模块名":caseOrder}]
+            finalData[func_name] = caseOrder
+
+    # 启动新的线程执行测试用例
+    path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+
+    obj = RunPyTest()
+    t = multiprocessing.Process(target=obj.run, args=(is_login.user_id, finalData, path))
+    t.start()
+
+    return jsonify(msg='OK')
+
+
 
 
 # 查看测试报告
 @case_page.route('/viewReport', methods=['GET'])
 def viewReport():
     is_login = check_login()
-    print(is_login, '****************************************************')
     if is_login == False:
         return ops_render('member/login.html')
-
-
     info = {'user_id':is_login.user_id}
-    return ops_render(r'/reports/index.html', info)
+
+    resp = make_response()
+    resp.status_code = 200
+    resp.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+    resp.response = ops_render(r'/reports/index.html', info)
+    resp.cache_control.public = False
+
+
+
+    return resp
 
 
 
