@@ -11,6 +11,7 @@ class OfferFunction():
         self.func_map = dict()
         self.func_map['getRanndomInt'] = self.getRanndomInt
         self.func_map['getTimeStamp'] = self.getTimeStamp
+        self.func_map['cateName'] = self.cateName
 
 
     def getRanndomInt(self):
@@ -18,6 +19,9 @@ class OfferFunction():
 
     def getTimeStamp(self):
         return int(time.time() * 1000)
+
+    def cateName(self):
+        return str(int(time.time() * 1000))[-6:]
 
 
 
@@ -27,7 +31,7 @@ class Common(OfferFunction):
     '''
 
 
-    # 解析是否需要提取之前接口的入参
+    # 解析是否需要提取之前接口的数据
     def extractData(self, data):
         d = json.dumps(data, ensure_ascii=False)
         pat = '#(.*?)#'

@@ -18,15 +18,14 @@ $('.do_add').click(function () {
     exp = $("#assert").text();
     explain = $("#explain").val();
     apiname = $(".apiname").attr("apiname");
-    func_id = $("#funcid").val();
-    alert(func_id);
     coordinationId = $(".apiname").attr("coordinationId");
+
     $.ajax({
         url: '/case/do_add',
         type: 'post',
         dataType: 'json',
         contentType: 'application/json',
-        data: JSON.stringify({"route":route,"param":param,"data":data,"exp":exp,"explain":explain,"apiname":apiname,"func_id":func_id,"coordinationId":coordinationId}),
+        data: JSON.stringify({"route":route,"param":param,"data":data,"exp":exp,"explain":explain,"apiname":apiname,"coordinationId":coordinationId}),
         success: function (resp) {
             alert(resp.msg);
         }

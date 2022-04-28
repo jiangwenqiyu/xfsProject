@@ -19,3 +19,4 @@ class Coordination(db.Model):
     data = db.Column(db.String(10000))
     dataType = db.Column(db.String(20))
     remarks = db.Column(db.String(255, 'utf8_general_ci'), server_default=db.FetchedValue())
+    func_id = db.Column(db.Integer)

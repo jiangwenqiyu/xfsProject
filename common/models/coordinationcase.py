@@ -21,6 +21,5 @@ class CoordinationCase(db.Model):
     ispj = db.Column(db.String(255), nullable=False)
     explain = db.Column(db.String(255))
     remarks = db.Column(db.String(255, 'utf8_general_ci'), server_default=db.FetchedValue())
-    func_id = db.Column(db.Integer)
     param = db.Column(db.JSON)
     coordination_id = db.Column(db.Integer)

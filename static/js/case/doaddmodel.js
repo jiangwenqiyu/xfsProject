@@ -18,13 +18,22 @@ var member_reg_ops = {
             var param = $(".addmodel_wrap input[name = param]").val();
             var data = $(".addmodel_wrap input[name = data]").val();
             var dataType = $(".addmodel_wrap input[name = dataType]").val();
+            var func_id = $("#funcid").val();
 
 
+            if (func_id == "undefined" || func_id.length < 1) {
+                common_ops.alert("系统功能模块id是必填项")
+                return;
+            }
             if (apiname == "undefined" || apiname.length < 1) {
                 common_ops.alert("接口名称是必填项")
                 return;
             }
-            ;
+            if (explain == "undefined" || explain.length < 1) {
+                common_ops.alert("中文解释是必填项")
+                return;
+            }
+
             if (route == "undefined" || route.length < 1) {
                 common_ops.alert("路径是必填项")
                 return;
@@ -33,8 +42,16 @@ var member_reg_ops = {
                 common_ops.alert("请求方法")
                 return;
             }
-            if (explain == "undefined" || explain.length < 1) {
-                common_ops.alert("中文解释是必填项")
+            if (param == "undefined" || param.length < 1) {
+                common_ops.alert("param是必填项")
+                return;
+            }
+            if (data == "undefined" || data.length < 1) {
+                common_ops.alert("请求参数是必填项")
+                return;
+            }
+            if (dataType == "undefined" || dataType.length < 1) {
+                common_ops.alert("参数类型是必填项")
                 return;
             }
 
@@ -49,8 +66,8 @@ var member_reg_ops = {
                     method: method,
                     param: param,
                     data: data,
-                    dataType: dataType
-
+                    dataType: dataType,
+                    func_id: func_id
 
                 },
                 success: function (res) {
