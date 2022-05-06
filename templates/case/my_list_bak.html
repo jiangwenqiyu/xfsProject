@@ -4,7 +4,7 @@
     <ul>
         {% for i in data %}
         <li>
-            <a href="#" f-id="{{ i.id }}" onclick="getSecondContent(this)">   {{ i.name }}   </a>
+            <a href="#" f-id="{{ i.id }}" onclick="getSecondContent(this)" class="a-tag-color">   {{ i.name }}   </a>
         </li>
         {% endfor %}
     </ul>
@@ -38,7 +38,7 @@
                 success: function (resp) {
                     // 请求成功后，加载二级模块
                     for (x in resp.data) {
-                        $('#second').children('ul').append('<li><a href="#" onclick="getThirdContent(this)" s-id=' + resp.data[x].id + '>' + resp.data[x].name + '</a></li>')
+                        $('#second').children('ul').append('<li><a class="a-tag-color" href="#" onclick="getThirdContent(this)" s-id=' + resp.data[x].id + '>' + resp.data[x].name + '</a></li>')
                     }
 
                 }
