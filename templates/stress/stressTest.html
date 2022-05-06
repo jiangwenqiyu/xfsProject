@@ -3,25 +3,23 @@
 {% block content %}
     <div>
         <button onclick="addRow();">+</button>
-{#        <button onclick="zhanyong();">申请占用</button>#}
-{#        <button onclick="zhanyong_release();">解除占用</button>#}
         <button id="btn-gen" onclick="generateScript();">生成脚本</button>
         <a id="switch" href="http://192.168.0.129:8089" hidden="hidden" target="_blank">压测界面</a>
     </div>
 
     <table border="1" cellspacing="0" width="1300" style="margin-top: 10px">
-        <thead>
+        <thead style="background-color: white">
         <th>编号</th>
         <th>请求地址</th>
         <th>请求方式:post/get</th>
         <th>入参类型:data/json</th>
         <th>请求头:没有填{}</th>
         <th>入参:没有填{}</th>
-        <th>断言:没有填{}</th>
+        <th><div>断言:没有填{}</div>需要前置指定数据类型</th>
         <th>权重:数字</th>
         </thead>
 
-        <tbody id="urls">
+        <tbody id="urls" style="background-color: white">
         <tr>
             <td>1</td>
             <td class="stress" contenteditable="true" width="200"></td>
