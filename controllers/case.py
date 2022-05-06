@@ -507,6 +507,27 @@ def exeCases():
 
 
 
+# 删除测试用例
+@case_page.route('/deletecases', methods=['POST'])
+def deleteCases():
+    '''
+    接收用例id列表，进行删除  {caseId:[]}
+    :return:
+    '''
+
+    req = request.get_json()
+    ids = req.get('caseId')
+    if ids == None:
+        return  jsonify(msg = '没有获取到入参')
+
+    print(ids,'*************************************')
+    db.session.query(CoordinationCase).filter(CoordinationCase.case_id.in_(ids)).delete()
+    db.session.commit()
+    return jsonify(msg='删除成功')
+
+
+
+
 
 # 查看测试报告
 @case_page.route('/viewReport', methods=['GET'])
