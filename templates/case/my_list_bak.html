@@ -47,6 +47,9 @@
         }
 
         function getThirdContent(obj) {
+
+
+
             // 先清空三级的内容
             $('#third').html('');
             sid = $(obj).attr('s-id');
@@ -57,6 +60,7 @@
                 dataType: 'json',
                 data: JSON.stringify({'func_id':sid}),
                 success: function (resp) {
+
                     // 请求成功后，加载三级模块
                     for (x in resp.data) {
                         case_id = resp.data[x].case_id
@@ -75,20 +79,18 @@
                         content += '<a href="/case/editcase?case_id=' + case_id + '" class="list-group-item">'
                         content += '<h4 class="list-group-item-heading ">' + apiname + '</h4>'
                         content += '<p style="display: none" class="allcase">' + case_id + '</p>'
-                        content += '<p class="list-group-item-text ' + case_id + ' " id="case_id">用例ID：' + case_id + '</p>'
+                        content += '<p class="list-group-item-text ' + case_id + ' " id="case_id">用例ID:' + case_id + '</p>'
                         content += '<p class="list-group-item-text">用例说明：' + explain + '</p>'
                         content += '<div class="row">'
                         content += '</div>'
                         content += '</a>'
                         content += '<div class="pull-right">'
                         content += '<button type="submit" class="btn btn-success btn-block do-test" name=' + case_id +  '>测试</button>'
+                        content += '<button type="submit" class="btn btn-success btn-block do-delete" name=' + case_id +  '>删除</button>'
                         content += '</div>'
                         content += '</div>'
                         content += '</div>'
                         content += '</div>'
-
-
-
 
                         $('#third').append(content);
                     }
@@ -99,10 +101,33 @@
         }
 
 
+        // 注册热键,删除功能
+        $(document).on('click', '.do-delete', function () {
+            var caseId = $(this).attr('name');
+            var currentDiv = $(this).parent().parent().parent().parent().parent().parent();
+
+            $.ajax({
+                url: '/case/deletecases',
+                method: 'post',
+                dataType: 'json',
+                contentType: 'application/json',
+                data: JSON.stringify({'caseId':[caseId]}),
+                success: function (resp) {
+                    if (resp.msg == "删除成功") {
+                        currentDiv.remove();
+                    }
+                    alert(resp.msg);
+                }
+
+            });
+        });
+
 
 
 
     </script>
 
 {% endblock %}
+
+
 
