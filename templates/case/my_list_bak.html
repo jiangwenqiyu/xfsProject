@@ -118,8 +118,34 @@
                     }
                     alert(resp.msg);
                 }
-
             });
+
+
+        });
+
+        // 注册热键,测试
+        $(document).on('click', '.do-test', function () {
+            var caseId = $(this).attr('name');
+            var parentTag = $(this).parent().parent().parent().parent();
+
+            $.ajax({
+                url: '/case/dotest',
+                method: 'post',
+                dataType: 'json',
+                contentType: 'application/json',
+                data: JSON.stringify({'caseId':caseId}),
+                success: function (resp) {
+                    if (resp.msg == '测试通过') {
+                        parentTag.append('<div class="showTest"><span style="color: green">测试通过</span></div>');
+                    } else {
+                        parentTag.append('<div class="showTest"><span style="color: red">'+JSON.stringify(resp)+'</span></div>');
+
+                    }
+                    {#alert(JSON.stringify(resp));#}
+                }
+            });
+
+
         });
 
 

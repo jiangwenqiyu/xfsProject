@@ -8,6 +8,7 @@ from common.models.supplier import Supplier
 from common.models.suppliercase import SupplierCase
 from common.models.coordination import Coordination
 from common.models.coordinationcase import CoordinationCase
+from common.models.reportInfo import ReportInfo
 from common.models.system_info import SystemInfo
 from common.models.func_info import FuncInfo
 from common.models.auth_map import AuthMap
@@ -20,6 +21,10 @@ from sqlalchemy.sql import and_
 import threading
 from exeCase.configPytest import RunPyTest
 import multiprocessing
+import requests
+import jmespath
+import datetime
+import time
 
 
 case_page = Blueprint("case", __name__)
@@ -380,75 +385,25 @@ def do_addmodel():
 
 
 # 执行测试用例
-# @case_page.route('/exeCases', methods=['POST'])
-def exeCases_bak():
-    '''
-    接收参数：[用例id]
-    :return:
-    '''
-    is_login = check_login()
-    if is_login == False:
-        return ops_render('member/login.html')
-
-
-    req = request.get_json()
-    caseids = req['caseids']  # 已经排好序的
-    # info = CoordinationCase.query.join(Coordination, Coordination.id==CoordinationCase.coordination_id).add_entity(Coordination).filter(CoordinationCase.case_id.in_(caseids)).all()
-    info = db.session.query(CoordinationCase.case_id,
-                            CoordinationCase.coordination_id,
-                            CoordinationCase.explain,
-                            CoordinationCase.route,
-                            CoordinationCase.param,
-                            CoordinationCase.case_data,
-                            CoordinationCase.expected_results,
-                            Coordination.method,
-                            Coordination.dataType).join(Coordination, Coordination.id==CoordinationCase.coordination_id).filter(CoordinationCase.case_id.in_(caseids)).all()
-    caseDict = dict()
-    for i in info:
-        temp = dict()
-        print(i.case_id,'*********')
-        temp['case_id'] = i.case_id
-        temp['coordination_id'] = i.coordination_id
-        temp['route'] = i.route
-        temp['param'] = i.param
-        temp['case_data'] = i.case_data
-        temp['expected_results'] = i.expected_results
-        temp['method'] = i.method
-        temp['dataType'] = i.dataType
-        temp['explain'] = i.explain
-
-        caseDict[i.case_id] = temp
-
-    # 把用例进行排序
-    caseOrder = list()
-    try:
-        for caseid in caseids:
-            caseOrder.append(caseDict[caseid])
-    except:
-        return jsonify(msg='id不存在,{}'.format(caseid))
-
-    # 启动新的线程执行测试用例
-    path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-    # print(path, '******************')
-    # return jsonify(ret='haha')
-
-    obj = RunPyTest()
-    t = multiprocessing.Process(target=obj.run, args=(is_login.user_id, caseOrder, path))
-    # t = threading.Thread(target=obj.run, args=(is_login.user_id, caseOrder))
-    t.start()
-
-    return jsonify(msg='OK')
-
-
 @case_page.route('/exeCases', methods=['POST'])
 def exeCases():
     '''
     接收参数：[{"func_id":1,"case":[排序好的用例id]}]
     :return:
     '''
+
+
     is_login = check_login()
     if is_login == False:
         return ops_render('member/login.html')
+
+    current = datetime.datetime.now()
+    # 创建时间
+    createTime = current.strftime("%Y-%m-%d %H:%M:%S")
+    # 报告后缀，年月日时分秒+13位时间戳后三位
+    backContent = current.strftime("%Y%m%d%H%M%S{}".format(str(int(time.time()*1000))[-3:]))
+    # 报告名
+    reportName = '测试报告_{}'.format(backContent)
 
 
     req = request.get_json()
@@ -500,8 +455,19 @@ def exeCases():
     path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 
     obj = RunPyTest()
-    t = multiprocessing.Process(target=obj.run, args=(is_login.user_id, finalData, path))
+    t = multiprocessing.Process(target=obj.run, args=(is_login.user_id, finalData, path, backContent))
     t.start()
+
+    # 保存测试报告到数据库
+    report = ReportInfo()
+    report.delflag = 0
+    report.createTime = createTime
+    report.reportName = reportName
+    report.user_id = is_login.user_id
+    report.backContent = backContent
+    db.session.add(report)
+    db.session.commit()
+
 
     return jsonify(msg='OK')
 
@@ -526,6 +492,60 @@ def deleteCases():
     return jsonify(msg='删除成功')
 
 
+# 测试测试用例-单独执行
+@case_page.route('/dotest', methods=['POST'])
+def dotest():
+    req = request.get_json()
+    caseid = req.get('caseId')
+    case = db.session.query(CoordinationCase.param,
+                            CoordinationCase.route,
+                            CoordinationCase.case_data,
+                            Coordination.dataType,
+                            Coordination.method,
+                            CoordinationCase.expected_results).join(Coordination, Coordination.id==CoordinationCase.coordination_id).filter(CoordinationCase.case_id==caseid).first()
+    if case == None:
+        return jsonify(msg='没有找到该用例')
+
+    header = header = {'contenType':'application/json',
+                       'cookie':'uc_token=e957c609b1554018ae97fe1dc86e9cf1'}
+
+    url = case.route
+    data = case.case_data
+    param = case.param
+    dataType = case.dataType
+    method = case.method
+    expected_results = case.expected_results
+
+    try:
+        if method.lower() == 'get':
+            res = requests.get(url, headers = header, params=param)
+        else:
+
+            if dataType.lower() == 'data':
+                res = requests.post(url, headers = header, params=param, data = data)
+            else:
+                res = requests.post(url, headers = header, params=param, json = data)
+
+            for pat in expected_results:
+                exp_value = expected_results[pat]
+                try:
+                    fact_value = jmespath.search(pat, res.json())
+                except:
+                    assert False, '断言获取字段失败\n断言表达式:{}\n返回的值:{}'.format(pat, res.text)
+
+                assert exp_value == fact_value, '\n断言失败\n断言表达式::{}\n期望值:{}\n实际结果:{}'.format(pat, exp_value, fact_value)
+
+
+        return jsonify(msg='测试通过')
+
+    except Exception as e:
+        return jsonify(
+            msg='测试不通过',
+            url = url,
+            param=param,
+            data = data,
+            error=str(e))
+
 
 
 
@@ -535,7 +555,12 @@ def viewReport():
     is_login = check_login()
     if is_login == False:
         return ops_render('member/login.html')
-    info = {'user_id':is_login.user_id}
+
+    # 从数据库获取测试报告列表
+    reports = db.session.query(ReportInfo).filter(ReportInfo.delflag==0).all()
+
+
+    info = {'user_id':is_login.user_id, 'reports':reports}
 
     resp = make_response()
     resp.status_code = 200
