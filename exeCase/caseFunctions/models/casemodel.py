@@ -12,7 +12,7 @@ from allure_commons._allure import Dynamic
 
 
 
-@allure.feature("测试模块")
+@allure.feature("测试模块-模板替换")
 class Test:
 
     # @allure.story('')
@@ -38,6 +38,23 @@ class Test:
         redis_store.setex('{}_param'.format(case_id), constance.REDIS_RES_EXPIRE, json.dumps(param, ensure_ascii=False))
         redis_store.setex('{}_data'.format(case_id), constance.REDIS_RES_EXPIRE, json.dumps(data, ensure_ascii=False))
 
+        # with allure.step('接口:{}'.format(url)):
+        #     pass
+        with allure.step('路径:  {}'.format(url)):
+            pass
+
+
+        with allure.step('请求方法:  {}'.format(method)):
+            pass
+
+        with allure.step('param:  {}'.format(param)):
+            pass
+
+        with allure.step('入参:  {}'.format(data)):
+            pass
+
+        with allure.step('断言:  {}'.format(expected_results)):
+            pass
 
         try:
             if method.lower() == 'get':
