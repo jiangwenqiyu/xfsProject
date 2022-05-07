@@ -55,7 +55,7 @@ class RunPyTest:
 
 
 
-    def run(self, userid, caseInfos, path):
+    def run(self, userid, caseInfos, path, reportbackContent):
         self.userid = userid
         self.path = path
         self.caseInfos = caseInfos
@@ -68,27 +68,30 @@ class RunPyTest:
             os.mkdir('{}/static/reports'.format(path))
 
         # 根据用户，创建用户自己的报告目录.如果有历史数据，先删除历史数据
-        if os.path.exists('{}/static/reports/{}'.format(path, self.userid)):
-            shutil.rmtree('{}/static/reports/{}'.format(path, self.userid))
-            os.mkdir('{}/static/reports/{}'.format(path, self.userid))
-        else:
-            os.mkdir('{}/static/reports/{}'.format(path, self.userid))
+        os.mkdir('{}/static/reports/{}_{}'.format(path, self.userid, reportbackContent))
+        # if os.path.exists('{}/static/reports/{}'.format(path, self.userid)):
+        #     shutil.rmtree('{}/static/reports/{}'.format(path, self.userid))
+        #     os.mkdir('{}/static/reports/{}'.format(path, self.userid))
+        # else:
+        #     os.mkdir('{}/static/reports/{}'.format(path, self.userid))
 
         # 判断用户下是否有临时allure目录
-        if os.path.exists('{}/static/reports/{}/report_temp'.format(path, self.userid)):
-            shutil.rmtree('{}/static/reports/{}/report_temp'.format(path, self.userid))
-            os.mkdir('{}/static/reports/{}/report_temp'.format(path, self.userid))
-        else:
-            os.mkdir('{}/static/reports/{}/report_temp'.format(path, self.userid))
+        os.mkdir('{}/static/reports/{}_{}/report_temp'.format(path, self.userid, reportbackContent))
+        # if os.path.exists('{}/static/reports/{}/report_temp'.format(path, self.userid)):
+        #     shutil.rmtree('{}/static/reports/{}/report_temp'.format(path, self.userid))
+        #     os.mkdir('{}/static/reports/{}/report_temp'.format(path, self.userid))
+        # else:
+        #     os.mkdir('{}/static/reports/{}/report_temp'.format(path, self.userid))
 
-        if os.path.exists('{}/static/reports/{}/report'.format(path, self.userid)):
-            shutil.rmtree('{}/static/reports/{}/report'.format(path, self.userid))
-            os.mkdir('{}/static/reports/{}/report'.format(path, self.userid))
-        else:
-            os.mkdir('{}/static/reports/{}/report'.format(path, self.userid))
+        os.mkdir('{}/static/reports/{}_{}/report'.format(path, self.userid, reportbackContent))
+        # if os.path.exists('{}/static/reports/{}/report'.format(path, self.userid)):
+        #     shutil.rmtree('{}/static/reports/{}/report'.format(path, self.userid))
+        #     os.mkdir('{}/static/reports/{}/report'.format(path, self.userid))
+        # else:
+        #     os.mkdir('{}/static/reports/{}/report'.format(path, self.userid))
 
-        tempdir = '{}/static/reports/{}/report_temp'.format(path, self.userid)
-        reportdir = '{}/static/reports/{}/report'.format(path, self.userid)
+        tempdir = '{}/static/reports/{}_{}/report_temp'.format(path, self.userid, reportbackContent)
+        reportdir = '{}/static/reports/{}_{}/report'.format(path, self.userid, reportbackContent)
 
         # 根据用户生成对应的执行测试用例文件
         if os.path.exists('{}/exeCase/caseFunctions'.format(path)):

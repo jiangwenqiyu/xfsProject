@@ -1,5 +1,13 @@
 {% extends "/common/layout.html" %}
 
 {% block content %}
-    <a class="a-tag-color" href="/static/reports/{{ user_id }}/report/index.html" target="_blank">查看测试报告</a>
+
+    {% for i in reports %}
+        <div style="margin-top: 10px;">
+            <a target="_blank" href="/static/reports/{{ user_id }}_{{ i.backContent }}/report/index.html">{{ i.reportName }}</a>
+            <a href="#" style="margin-left: 50px;">删除</a>
+        </div>
+    {% endfor %}
+
+{#    <a class="a-tag-color" href="/static/reports/{{ user_id }}/report/index.html" target="_blank">查看测试报告</a>#}
 {% endblock %}
