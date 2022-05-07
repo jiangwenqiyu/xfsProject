@@ -115,8 +115,8 @@ class RunPyTest:
         calc = 1
         for name in caseInfos:
             for i in body:
-                if "@allure.feature" in i:
-                    content += i.replace('@allure.feature("测试模块")', '@allure.feature("{}")'.format(name))
+                if "测试模块-模板替换" in i:
+                    content += i.replace('@allure.feature("测试模块-模板替换")', '@allure.feature("{}")'.format(name))
                 elif "PyConfig.caseInfos" in i:
                     content += i.replace("@pytest.mark.parametrize('caseInfo', PyConfig.caseInfos)", "@pytest.mark.parametrize('caseInfo', PyConfig.caseInfos{})".format('["{}"]'.format(name)))
                 elif 'class Test' in i:
