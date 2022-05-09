@@ -15,41 +15,42 @@ class RunPyTest:
         self.userid = None
         self.path = None
         self.caseInfos = None
+        self.reportbackContent = None
 
 
     def diyReport(self):
         # 改title
-        with open('{}/static/reports/{}/report/index.html'.format(self.path, self.userid), 'r') as f1:
+        with open('{}/static/reports/{}_{}/report/index.html'.format(self.path, self.userid, self.reportbackContent), 'r') as f1:
             file = f1.read()
             file = file.replace('Allure Report', '鑫方盛测试平台-测试报告')
 
-            with open('{}/static/reports/{}/report/index.html'.format(self.path, self.userid), 'w', encoding='utf8') as f2:
+            with open('{}/static/reports/{}_{}/report/index.html'.format(self.path, self.userid, self.reportbackContent), 'w', encoding='utf8') as f2:
                 f2.write(file)
 
         # 改主页标题
-        with open('{}/static/reports/{}/report/widgets/summary.json'.format(self.path, self.userid), 'r') as f1:
+        with open('{}/static/reports/{}_{}/report/widgets/summary.json'.format(self.path, self.userid, self.reportbackContent), 'r') as f1:
             file = json.loads(f1.read())
             file['reportName'] = '鑫方盛测试中心'
-            with open('{}/static/reports/{}/report/widgets/summary.json'.format(self.path, self.userid), 'w', encoding='utf8') as f2:
+            with open('{}/static/reports/{}_{}/report/widgets/summary.json'.format(self.path, self.userid, self.reportbackContent), 'w', encoding='utf8') as f2:
                 f2.write(json.dumps(file))
 
         # 改标题栏
-        with open('{}/static/reports/{}/report/app.js'.format(self.path, self.userid), 'r', encoding='utf8') as f1:
+        with open('{}/static/reports/{}_{}/report/app.js'.format(self.path, self.userid, self.reportbackContent), 'r', encoding='utf8') as f1:
             file = f1.read()
             file = file.replace('测试套', '方法路径')
-            with open('{}/static/reports/{}/report/app.js'.format(self.path, self.userid), 'w', encoding='utf8') as f2:
+            with open('{}/static/reports/{}_{}/report/app.js'.format(self.path, self.userid, self.reportbackContent), 'w', encoding='utf8') as f2:
                 f2.write(file)
 
-        with open('{}/static/reports/{}/report/plugins/behaviors/index.js'.format(self.path, self.userid), 'r', encoding='utf8') as f1:
+        with open('{}/static/reports/{}_{}/report/plugins/behaviors/index.js'.format(self.path, self.userid, self.reportbackContent), 'r', encoding='utf8') as f1:
             file = f1.read()
             file = file.replace('功能', '模块用例结果')
-            with open('{}/static/reports/{}/report/plugins/behaviors/index.js'.format(self.path, self.userid), 'w', encoding='utf8') as f2:
+            with open('{}/static/reports/{}_{}/report/plugins/behaviors/index.js'.format(self.path, self.userid, self.reportbackContent), 'w', encoding='utf8') as f2:
                 f2.write(file)
 
-        with open('{}/static/reports/{}/report/plugins/behaviors/index.js'.format(self.path, self.userid), 'r', encoding='utf8') as f1:
+        with open('{}/static/reports/{}_{}/report/plugins/behaviors/index.js'.format(self.path, self.userid, self.reportbackContent), 'r', encoding='utf8') as f1:
             file = f1.read()
             file = file.replace('包', '用例总览')
-            with open('{}/static/reports/{}/report/plugins/behaviors/index.js'.format(self.path, self.userid), 'w', encoding='utf8') as f2:
+            with open('{}/static/reports/{}_{}/report/plugins/behaviors/index.js'.format(self.path, self.userid, self.reportbackContent), 'w', encoding='utf8') as f2:
                 f2.write(file)
 
 
@@ -59,7 +60,9 @@ class RunPyTest:
         self.userid = userid
         self.path = path
         self.caseInfos = caseInfos
+        self.reportbackContent = reportbackContent
         PyConfig.caseInfos = caseInfos
+
 
         # 创建报告目录
         if os.path.exists('{}/static/reports'.format(path)):
