@@ -1,11 +1,11 @@
-from flask import Blueprint, request, jsonify
+from flask import request, jsonify
 from common.libs.helper import ops_render
 from interceptors.Auth import check_login
 from flask import session
+from controllers import api_stress
 import os
 
 
-api_stress = Blueprint('stress', __name__)
 
 
 
@@ -19,8 +19,6 @@ def stress():
 
 
     return ops_render('stress/stressTest.html')
-
-
 
 
 

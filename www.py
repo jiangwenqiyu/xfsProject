@@ -1,9 +1,6 @@
 # coding=utf-8
 #路由注册
-from controllers.index import index_page
-from controllers.member import member_page
-from controllers.case import case_page
-from controllers.stressTest import api_stress
+from controllers import case_page, member_page, index_page, api_stress
 from app import app
 from flask_debugtoolbar import DebugToolbarExtension
 toolbar = DebugToolbarExtension(app)

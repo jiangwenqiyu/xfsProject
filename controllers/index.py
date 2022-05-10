@@ -1,15 +1,11 @@
 # -*- coding: utf-8 -*-
-from flask import Blueprint, render_template, request, redirect
-
-from common.libs import UrlManager
-from common.models.user import User
-from app import app
+from flask import request
 from common.libs.helper import ops_render
 from interceptors.Auth import check_login
 from common.models.address import Address
 from common.models.pjname import Pjname
+from controllers import index_page
 
-index_page = Blueprint( "index_page",__name__ )
 
 @index_page.route("/")
 def index():
