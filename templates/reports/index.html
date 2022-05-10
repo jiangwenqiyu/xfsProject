@@ -6,6 +6,7 @@
         <div style="margin-top: 10px;">
             <a target="_blank" href="/static/reports/{{ user_id }}_{{ i.backContent }}/report/index.html">{{ i.reportName }}</a>
             <a href="#" style="margin-left: 50px;" repid={{ i.id }} onclick=deleteReport(this)>删除</a>
+            <a href="#" style="margin-left: 50px;" repid={{ i.id }} onclick=deleteReportReal(this)>彻底删除</a>
         </div>
     {% endfor %}
 
@@ -14,6 +15,22 @@
             repid = $(obj).attr('repid');
             $.ajax({
                 url: '/case/deleteReport',
+                contentType: 'application/json',
+                type: 'POST',
+                dataType: 'json',
+                data: JSON.stringify({'repid': repid}),
+                success: function (resp) {
+                    alert(resp.msg)
+                }
+            });
+
+
+        }
+
+        function deleteReportReal(obj) {
+            repid = $(obj).attr('repid');
+            $.ajax({
+                url: '/case/deleteReportReal',
                 contentType: 'application/json',
                 type: 'POST',
                 dataType: 'json',
