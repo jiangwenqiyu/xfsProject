@@ -2,7 +2,8 @@
 import json
 import os
 from app import app, db
-from flask import Blueprint, request, redirect, g, jsonify, make_response
+from . import case_page
+from flask import request, redirect, g, jsonify, make_response
 from common.libs import helper, UrlManager
 from common.models.supplier import Supplier
 from common.models.suppliercase import SupplierCase
@@ -18,7 +19,6 @@ from common.libs.requery import requery
 from testmain import run
 from testmain import runway
 from sqlalchemy.sql import and_
-import threading
 from exeCase.configPytest import RunPyTest
 import multiprocessing
 import requests
@@ -27,7 +27,6 @@ import datetime
 import time
 
 
-case_page = Blueprint("case", __name__)
 
 
 @case_page.route("/case_list", methods=["GET", "POST"])
@@ -557,7 +556,7 @@ def viewReport():
         return ops_render('member/login.html')
 
     # 从数据库获取测试报告列表
-    reports = db.session.query(ReportInfo).filter(ReportInfo.delflag==0).all()
+    reports = db.session.query(ReportInfo).filter(and_(ReportInfo.delflag==0, ReportInfo.user_id==is_login.user_id)).all()
 
 
     info = {'user_id':is_login.user_id, 'reports':reports}
@@ -568,11 +567,21 @@ def viewReport():
     resp.response = ops_render(r'/reports/index.html', info)
     resp.cache_control.public = False
 
-
-
     return resp
 
 
+@case_page.route('/deleteReport', methods=['POST'])
+def deleteReport():
+    is_login = check_login()
+    if is_login == False:
+        return ops_render('member/login.html')
+
+    req = request.get_json()
+    repid = req['repid']
+
+    db.session.query(ReportInfo).filter(ReportInfo.id==repid).update({"delflag":1})
+    db.session.commit()
+    return jsonify(msg='删除成功！')
 
 
 

@@ -1,13 +1,14 @@
 # coding=utf-8
 from app import app,db
-from flask import Blueprint,request,make_response,redirect
+from . import member_page
+from flask import request,make_response,redirect
 from common.libs import helper, UrlManager
 from common.models.user import User
 from common.libs import UserService
 from common.libs.helper import ops_render
 from flask import session
 
-member_page = Blueprint("member_page",__name__)
+
 @member_page.route("/login",methods = ["GET","POST"])
 def login():
     if request.method == "GET":
