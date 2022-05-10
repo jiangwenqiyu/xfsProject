@@ -570,6 +570,7 @@ def viewReport():
     return resp
 
 
+# 删除测试报告：逻辑
 @case_page.route('/deleteReport', methods=['POST'])
 def deleteReport():
     is_login = check_login()
@@ -585,5 +586,25 @@ def deleteReport():
 
 
 
+# 删除测试报告：物理删除
+@case_page.route('/deleteReportReal', methods=['POST'])
+def deleteReportReal():
+    import shutil
+    is_login = check_login()
+    if is_login == False:
+        return ops_render('member/login.html')
 
+    req = request.get_json()
+    repid = req['repid']
+
+    repinfo = db.session.query(ReportInfo).filter(ReportInfo.id==repid)
+    backcontent = repinfo.first().backContent
+    repinfo.delete()
+    db.session.commit()
+
+
+    # 删除服务器文件
+    shutil.rmtree('./static/reports/{}_{}'.format(is_login.user_id, backcontent))
+
+    return jsonify(msg='删除成功！')
 
