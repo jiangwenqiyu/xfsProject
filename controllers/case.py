@@ -784,7 +784,7 @@ def runCaseUnderGroup():
                              CoordinationCase.expected_results).join(Coordination, Coordination.id==CoordinationCase.coordination_id).filter(CoordinationCase.case_id.in_(caseids))
     for caseid in caseids:
         for case in cases:
-            if caseid == case.case_id:
+            if caseid == str(case.case_id):
                 url = case.route
                 data = case.case_data
                 param = case.param
