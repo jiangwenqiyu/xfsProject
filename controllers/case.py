@@ -635,9 +635,6 @@ def saveGroup():
     group.desc = desc
     group.caseids = ids
     group.user_id = is_login.user_id
-    print(group.desc)
-    print(group.caseids)
-    print(group.user_id)
     db.session.add(group)
     db.session.commit()
     return jsonify(**RetJson.retContent(RetJson.successCode, None, '保存成功'))
