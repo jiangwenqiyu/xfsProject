@@ -782,29 +782,31 @@ def runCaseUnderGroup():
                              Coordination.dataType,
                              Coordination.method,
                              CoordinationCase.expected_results).join(Coordination, Coordination.id==CoordinationCase.coordination_id).filter(CoordinationCase.case_id.in_(caseids))
-    for case in cases:
-        url = case.route
-        data = case.case_data
-        param = case.param
-        dataType = case.dataType
-        method = case.method
-        expected_results = case.expected_results
+    for caseid in caseids:
+        for case in cases:
+            if caseid == case.case_id:
+                url = case.route
+                data = case.case_data
+                param = case.param
+                dataType = case.dataType
+                method = case.method
+                expected_results = case.expected_results
 
-        try:
-            if method.lower() == 'get':
-                res = requests.get(url, headers = header, params=param)
-            else:
+                try:
+                    if method.lower() == 'get':
+                        res = requests.get(url, headers = header, params=param)
+                    else:
 
-                if dataType.lower() == 'data':
-                    res = requests.post(url, headers = header, params=param, data = data)
-                else:
-                    res = requests.post(url, headers = header, params=param, json = data)
-        except:
-            return jsonify(**RetJson.retContent(RetJson.failCode, None, '用例id:{} 执行时发生错误'.format(case.case_id)))
+                        if dataType.lower() == 'data':
+                            res = requests.post(url, headers = header, params=param, data = data)
+                        else:
+                            res = requests.post(url, headers = header, params=param, json = data)
+                except:
+                    return jsonify(**RetJson.retContent(RetJson.failCode, None, '用例id:{} 执行时发生错误'.format(case.case_id)))
 
-        temp = dict()
-        temp[case.case_id] = res.json()
-        ret.append(temp)
+                temp = dict()
+                temp[case.case_id] = res.json()
+                ret.append(temp)
 
 
 
