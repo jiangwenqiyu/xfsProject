@@ -3,10 +3,11 @@ import pytest
 import shutil
 import time
 import json
+from app import db
+
 
 class PyConfig:
     caseInfos = []
-
 
 
 class RunPyTest:
@@ -56,7 +57,7 @@ class RunPyTest:
 
 
 
-    def run(self, userid, caseInfos, path, reportbackContent):
+    def run(self, userid, caseInfos, path, reportbackContent, repId):
         self.userid = userid
         self.path = path
         self.caseInfos = caseInfos
@@ -146,6 +147,10 @@ class RunPyTest:
 
         # 生成报告后，改下基础信息
         self.diyReport()
+
+        # 变更数据库状态
+        db.session.execute('''update reportInfo s set s.exeState=1 where s.id='{}' '''.format(repId))
+        db.session.commit()
 
 
 

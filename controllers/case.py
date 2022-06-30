@@ -473,7 +473,7 @@ def exeCases():
     # 创建时间
     createTime = current.strftime("%Y-%m-%d %H:%M:%S")
     # 报告后缀，年月日时分秒+13位时间戳后三位
-    backContent = current.strftime("%Y%m%d%H%M%S{}".format(str(int(time.time()*1000))[-3:]))
+    backContent = current.strftime("%Y_%m_%d_%H_%M_%S_{}".format(str(int(time.time()*1000))[-3:]))
     # 报告名
     reportName = '测试报告_{}'.format(backContent)
 
@@ -526,10 +526,6 @@ def exeCases():
     # 当前文件的上级路径，系统绝对路径
     path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 
-    # 启动新的进程执行测试用例
-    obj = RunPyTest()
-    t = multiprocessing.Process(target=obj.run, args=(is_login.user_id, finalData, path, backContent))
-    t.start()
 
     # 保存测试报告到数据库
     report = ReportInfo()
@@ -540,6 +536,15 @@ def exeCases():
     report.backContent = backContent
     db.session.add(report)
     db.session.commit()
+
+    # 启动新的进程执行测试用例
+    obj = RunPyTest()
+    t = multiprocessing.Process(target=obj.run, args=(is_login.user_id, finalData, path, backContent, report.id))
+    t.start()
+
+
+
+
 
 
     return jsonify(msg='OK')

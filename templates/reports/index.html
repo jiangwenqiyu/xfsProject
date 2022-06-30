@@ -12,15 +12,15 @@
 
     <tbody>
     {% for i in reports %}
-        <tr>
+        <tr style="height: 25px">
             <td><a target="_blank" href="/static/reports/{{ user_id }}_{{ i.backContent }}/report/index.html">{{ i.reportName }}</a></td>
-            <td><a href="#" style="margin-left: 50px;" repid={{ i.id }} onclick=deleteReport(this)>删除</a></td>
-            <td><a href="#" style="margin-left: 50px;" repid={{ i.id }} onclick=deleteReportReal(this)>彻底删除</a></td>
-            <div style="margin-top: 10px;">
-
-
-
-            </div>
+            {% if i.exeState == 0 %}
+                <td style="color: orangered">执行中</td>
+            {% else %}
+                <td style="color: lightseagreen">完成</td>
+            {% endif %}
+            <td><a href="#" style="margin-left: 50px;" repid={{ i.id }} onclick=deleteReport(this)>删除</a><a href="#" style="margin-left: 50px;" repid={{ i.id }} onclick=deleteReportReal(this)>彻底删除</a></td>
+{#            <div style="margin-top: 10px;"></div>#}
         </tr>
     {% endfor %}
 
@@ -40,6 +40,9 @@
                 data: JSON.stringify({'repid': repid}),
                 success: function (resp) {
                     alert(resp.msg)
+                    // 删除成功后，清除当前页面信息
+                    var td = $(obj).parent().parent()
+                    td.remove()
                 }
             });
 
