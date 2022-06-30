@@ -141,6 +141,7 @@ class RunPyTest:
         pytest.main(['-vs',  '{}/exeCase/caseFunctions/{}/testcases.py'.format(path, self.userid), '--alluredir', '{}'.format(tempdir) ])
         # 生成报告
         os.system('allure generate {} -o {} -c {}'.format(tempdir, reportdir, reportdir))
+        print('allure generate {} -o {} -c {}'.format(tempdir, reportdir, reportdir))
 
         # 生成报告后，改下基础信息
         self.diyReport()

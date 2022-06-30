@@ -523,9 +523,10 @@ def exeCases():
             # 排序之后存入返回变量 [{"模块名":caseOrder}]
             finalData[func_name] = caseOrder
 
-    # 启动新的线程执行测试用例
+    # 当前文件的上级路径，系统绝对路径
     path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 
+    # 启动新的进程执行测试用例
     obj = RunPyTest()
     t = multiprocessing.Process(target=obj.run, args=(is_login.user_id, finalData, path, backContent))
     t.start()
