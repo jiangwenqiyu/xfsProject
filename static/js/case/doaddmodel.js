@@ -23,7 +23,7 @@ var member_reg_ops = {
             var func_id = $("#funcInfo option:selected").attr('value');
 
 
-            if (func_id == null) {
+            if (func_id == null || func_id == "None") {
                 common_ops.alert("系统功能没有选择")
                 return;
             }
