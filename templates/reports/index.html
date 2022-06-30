@@ -2,13 +2,32 @@
 
 {% block content %}
 
+    <table>
+    <thead>
+    <tr>
+        <td style="padding-right: 450px;text-align: center;vertical-align: middle">标题</td>
+        <td style="padding-right: 100px;text-align: center;vertical-align: middle">执行状态</td>
+        <td style="padding-right: 0px;text-align: center;vertical-align: middle">操作</td></tr>
+    </thead>
+
+    <tbody>
     {% for i in reports %}
-        <div style="margin-top: 10px;">
-            <a target="_blank" href="/static/reports/{{ user_id }}_{{ i.backContent }}/report/index.html">{{ i.reportName }}</a>
-            <a href="#" style="margin-left: 50px;" repid={{ i.id }} onclick=deleteReport(this)>删除</a>
-            <a href="#" style="margin-left: 50px;" repid={{ i.id }} onclick=deleteReportReal(this)>彻底删除</a>
-        </div>
+        <tr>
+            <td><a target="_blank" href="/static/reports/{{ user_id }}_{{ i.backContent }}/report/index.html">{{ i.reportName }}</a></td>
+            <td><a href="#" style="margin-left: 50px;" repid={{ i.id }} onclick=deleteReport(this)>删除</a></td>
+            <td><a href="#" style="margin-left: 50px;" repid={{ i.id }} onclick=deleteReportReal(this)>彻底删除</a></td>
+            <div style="margin-top: 10px;">
+
+
+
+            </div>
+        </tr>
     {% endfor %}
+
+    </tbody>
+    </table>
+
+
 
     <script>
         function deleteReport(obj) {
