@@ -1,7 +1,7 @@
 import os
 import pytest
 import shutil
-import requests
+import time
 import json
 
 class PyConfig:
@@ -140,6 +140,7 @@ class RunPyTest:
         #执行pytest
         pytest.main(['-vs',  '{}/exeCase/caseFunctions/{}/testcases.py'.format(path, self.userid), '--alluredir', '{}'.format(tempdir) ])
         # 生成报告
+        time.sleep(2)
         os.system('allure generate {} -o {} -c {}'.format(tempdir, reportdir, reportdir))
         print('allure generate {} -o {} -c {}'.format(tempdir, reportdir, reportdir))
 
