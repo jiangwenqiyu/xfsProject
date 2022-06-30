@@ -33,17 +33,32 @@ header = header = {'contenType':'application/json',
                    'cookie':'uc_token=e957c609b1554018ae97fe1dc86e9cf1'}
 
 
+# @case_page.route("/case_list", methods=["GET", "POST"])
+# def case_list():
+#     is_login = check_login()
+#     if is_login == False:
+#         return ops_render('member/login.html')
+#     req = request.values
+#     pjnames = req['pjname'] if 'pjname' in req else ""
+#     address = req['pjname'] if 'pjname' in req else ""
+#     querys = Coordination.query
+#     data_list = querys.all()
+#     return ops_render('case/case_list.html', {"data": data_list})
+
+
 @case_page.route("/case_list", methods=["GET", "POST"])
 def case_list():
     is_login = check_login()
     if is_login == False:
         return ops_render('member/login.html')
-    req = request.values
-    pjnames = req['pjname'] if 'pjname' in req else ""
-    address = req['pjname'] if 'pjname' in req else ""
-    querys = Coordination.query
-    data_list = querys.all()
-    return ops_render('case/case_list.html', {"data": data_list})
+
+    # 根据映射表，查询用户的一级模块权限
+    info = SystemInfo.query.all()
+    if not info:
+        return redirect(UrlManager.UrlManager.buildUrl("/case_list"))
+    return ops_render('case/case_list.html', {'data':info})
+
+
 
 @case_page.route("/create_json", methods=["GET", "POST"])
 def create_json():
@@ -215,8 +230,8 @@ def getSecondContent():
 
     return jsonify(status='0', data=data)
 
-@case_page.route("/getThirdContent", methods=["POST"])
-def getThirdContent():
+@case_page.route("/getThirdContent_case", methods=["POST"])
+def getThirdContentCase():
     is_login = check_login()
     if is_login == False:
         return ops_render('member/login.html')
@@ -261,6 +276,37 @@ def getThirdContent():
 
     return jsonify(status='0', data=data)
 
+
+@case_page.route("/getThirdContent_model", methods=["POST"])
+def getThirdContentModel():
+    is_login = check_login()
+    if is_login == False:
+        return ops_render('member/login.html')
+
+    req = request.get_json()
+    func_id = req.get('func_id')
+
+    info = db.session.execute('''select s1.id, s1.apiname, s1.explain, count(s2.case_id) num from coordination s1
+                                    left join coordination_case s2 on s1.id = s2.coordination_id
+                                    where s1.func_id = {}
+                                    group by s1.id'''.format(func_id))
+    data = []
+    for i in info:
+        temp = dict()
+        model_id = i[0]
+        model_name = i[1]
+        model_explain = i[2]
+        case_num = i[3]
+        temp['model_id'] = model_id
+        temp['model_name'] = model_name
+        temp['model_explain'] = model_explain
+        temp['case_num'] = case_num
+        data.append(temp)
+
+    print(data)
+
+
+    return jsonify(status='0', data=data)
 
 
 
@@ -333,7 +379,30 @@ def addmodel():
     is_login = check_login()
     if is_login == False:
         return ops_render('member/login.html')
-    return ops_render('case/addmodel.html')
+    # 获取系统及功能信息
+    result = list(db.session.execute('''select s1.name, s2.id, s2.name from system_info s1
+                                        left join func_info s2 on s1.id = s2.system_id'''))
+    sysnames = set()
+    for i in result:
+        sysnames.add(i[0])
+
+    # [{"商品中心":[[10,"新增分类"], ]}]
+    data = []
+    for name in sysnames:
+        temp = dict()
+        temp['sysname'] = name
+        te = []
+        for i in result:
+            t = []
+            if name == i[0]:
+                print(i)
+                t.append(i[1])
+                t.append(i[2])
+                te.append(t)
+        temp['func'] = te
+        data.append(temp)
+    print(data, '********************')
+    return ops_render('case/addmodel.html', {'data': data})
 
 
 @case_page.route("/do_addmodel", methods=["GET", "POST"])
@@ -493,6 +562,29 @@ def deleteCases():
     db.session.query(CoordinationCase).filter(CoordinationCase.case_id.in_(ids)).delete()
     db.session.commit()
     return jsonify(msg='删除成功')
+
+
+# 删除测试用例模板
+@case_page.route('/deletemodel', methods=['POST'])
+def deleteModel():
+    '''
+    接收用例id列表，进行删除  {caseId:[]}
+    :return:
+    '''
+
+    req = request.get_json()
+    model_id = req.get('model_id')
+    if model_id == None:
+        return  jsonify(msg = '没有获取到入参')
+
+    db.session.query(Coordination).filter(Coordination.id==model_id).delete()
+    try:
+        db.session.commit()
+        return jsonify(msg='删除成功')
+    except:
+        db.session.rollback()
+        return jsonify(msg='删除失败')
+
 
 
 # 测试测试用例-单独执行
