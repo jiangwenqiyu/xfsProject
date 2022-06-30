@@ -6,6 +6,8 @@ var member_reg_ops = {
     eventBind: function () {
         $(".addmodel_wrap .do-addmodel").click(function () {
 
+
+
             var btn_target = $(this);
             if (btn_target.hasClass("disabled")) {
                 layer.alert("稍等，正处理呢～");
@@ -18,11 +20,11 @@ var member_reg_ops = {
             var param = $(".addmodel_wrap input[name = param]").val();
             var data = $(".addmodel_wrap input[name = data]").val();
             var dataType = $(".addmodel_wrap input[name = dataType]").val();
-            var func_id = $("#funcid").val();
+            var func_id = $("#funcInfo option:selected").attr('value');
 
 
-            if (func_id == "undefined" || func_id.length < 1) {
-                common_ops.alert("系统功能模块id是必填项")
+            if (func_id == null) {
+                common_ops.alert("系统功能没有选择")
                 return;
             }
             if (apiname == "undefined" || apiname.length < 1) {

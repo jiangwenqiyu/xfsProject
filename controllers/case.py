@@ -12,7 +12,9 @@ from common.models.coordinationcase import CoordinationCase
 from common.models.reportInfo import ReportInfo
 from common.models.system_info import SystemInfo
 from common.models.func_info import FuncInfo
+from common.models.CaseGroup import CaseGroup
 from common.models.auth_map import AuthMap
+from common.RetJson import RetJson
 from common.libs.helper import ops_render
 from interceptors.Auth import check_login
 from common.libs.requery import requery
@@ -27,6 +29,21 @@ import datetime
 import time
 
 
+header = header = {'contenType':'application/json',
+                   'cookie':'uc_token=e957c609b1554018ae97fe1dc86e9cf1'}
+
+
+# @case_page.route("/case_list", methods=["GET", "POST"])
+# def case_list():
+#     is_login = check_login()
+#     if is_login == False:
+#         return ops_render('member/login.html')
+#     req = request.values
+#     pjnames = req['pjname'] if 'pjname' in req else ""
+#     address = req['pjname'] if 'pjname' in req else ""
+#     querys = Coordination.query
+#     data_list = querys.all()
+#     return ops_render('case/case_list.html', {"data": data_list})
 
 
 @case_page.route("/case_list", methods=["GET", "POST"])
@@ -34,12 +51,14 @@ def case_list():
     is_login = check_login()
     if is_login == False:
         return ops_render('member/login.html')
-    req = request.values
-    pjnames = req['pjname'] if 'pjname' in req else ""
-    address = req['pjname'] if 'pjname' in req else ""
-    querys = Coordination.query
-    data_list = querys.all()
-    return ops_render('case/case_list.html', {"data": data_list})
+
+    # 根据映射表，查询用户的一级模块权限
+    info = SystemInfo.query.all()
+    if not info:
+        return redirect(UrlManager.UrlManager.buildUrl("/case_list"))
+    return ops_render('case/case_list.html', {'data':info})
+
+
 
 @case_page.route("/create_json", methods=["GET", "POST"])
 def create_json():
@@ -211,8 +230,8 @@ def getSecondContent():
 
     return jsonify(status='0', data=data)
 
-@case_page.route("/getThirdContent", methods=["POST"])
-def getThirdContent():
+@case_page.route("/getThirdContent_case", methods=["POST"])
+def getThirdContentCase():
     is_login = check_login()
     if is_login == False:
         return ops_render('member/login.html')
@@ -257,6 +276,37 @@ def getThirdContent():
 
     return jsonify(status='0', data=data)
 
+
+@case_page.route("/getThirdContent_model", methods=["POST"])
+def getThirdContentModel():
+    is_login = check_login()
+    if is_login == False:
+        return ops_render('member/login.html')
+
+    req = request.get_json()
+    func_id = req.get('func_id')
+
+    info = db.session.execute('''select s1.id, s1.apiname, s1.explain, count(s2.case_id) num from coordination s1
+                                    left join coordination_case s2 on s1.id = s2.coordination_id
+                                    where s1.func_id = {}
+                                    group by s1.id'''.format(func_id))
+    data = []
+    for i in info:
+        temp = dict()
+        model_id = i[0]
+        model_name = i[1]
+        model_explain = i[2]
+        case_num = i[3]
+        temp['model_id'] = model_id
+        temp['model_name'] = model_name
+        temp['model_explain'] = model_explain
+        temp['case_num'] = case_num
+        data.append(temp)
+
+    print(data)
+
+
+    return jsonify(status='0', data=data)
 
 
 
@@ -329,7 +379,30 @@ def addmodel():
     is_login = check_login()
     if is_login == False:
         return ops_render('member/login.html')
-    return ops_render('case/addmodel.html')
+    # 获取系统及功能信息
+    result = list(db.session.execute('''select s1.name, s2.id, s2.name from system_info s1
+                                        left join func_info s2 on s1.id = s2.system_id'''))
+    sysnames = set()
+    for i in result:
+        sysnames.add(i[0])
+
+    # [{"商品中心":[[10,"新增分类"], ]}]
+    data = []
+    for name in sysnames:
+        temp = dict()
+        temp['sysname'] = name
+        te = []
+        for i in result:
+            t = []
+            if name == i[0]:
+                print(i)
+                t.append(i[1])
+                t.append(i[2])
+                te.append(t)
+        temp['func'] = te
+        data.append(temp)
+    print(data, '********************')
+    return ops_render('case/addmodel.html', {'data': data})
 
 
 @case_page.route("/do_addmodel", methods=["GET", "POST"])
@@ -491,6 +564,29 @@ def deleteCases():
     return jsonify(msg='删除成功')
 
 
+# 删除测试用例模板
+@case_page.route('/deletemodel', methods=['POST'])
+def deleteModel():
+    '''
+    接收用例id列表，进行删除  {caseId:[]}
+    :return:
+    '''
+
+    req = request.get_json()
+    model_id = req.get('model_id')
+    if model_id == None:
+        return  jsonify(msg = '没有获取到入参')
+
+    db.session.query(Coordination).filter(Coordination.id==model_id).delete()
+    try:
+        db.session.commit()
+        return jsonify(msg='删除成功')
+    except:
+        db.session.rollback()
+        return jsonify(msg='删除失败')
+
+
+
 # 测试测试用例-单独执行
 @case_page.route('/dotest', methods=['POST'])
 def dotest():
@@ -505,8 +601,6 @@ def dotest():
     if case == None:
         return jsonify(msg='没有找到该用例')
 
-    header = header = {'contenType':'application/json',
-                       'cookie':'uc_token=e957c609b1554018ae97fe1dc86e9cf1'}
 
     url = case.route
     data = case.case_data
@@ -607,4 +701,207 @@ def deleteReportReal():
     shutil.rmtree('./static/reports/{}_{}'.format(is_login.user_id, backcontent))
 
     return jsonify(msg='删除成功！')
+
+
+''' 2022.5.31  新功能，添加测试用例组  '''
+# 新增组
+@case_page.route('/saveGroup', methods=['POST'])
+def saveGroup():
+    '''
+    {'desc':'测试组','caseId':['30','31','32']}
+    :return:
+    '''
+    is_login = check_login()
+    if is_login == False:
+        return ops_render('member/login.html')
+
+    desc = request.get_json().get('desc')
+    caseId = request.get_json().get('caseId')
+    if desc == None or caseId == None:
+        return jsonify(**RetJson.retContent(RetJson.failCode, None, '用例id或者组描述为空'))
+
+    # 把传入的caseid，转成字符串
+    ids = ','.join(caseId)
+
+    group = CaseGroup()
+    group.desc = desc
+    group.caseids = ids
+    group.user_id = is_login.user_id
+    db.session.add(group)
+    db.session.commit()
+    return jsonify(**RetJson.retContent(RetJson.successCode, None, '保存成功'))
+
+
+# 更新
+@case_page.route('/updateGroup', methods=['POST'])
+def updateGroup():
+    '''
+    {'groupid':'2','caseId':['33'], 'desc':'123'}
+    :return:
+    '''
+    is_login = check_login()
+    if is_login == False:
+        return ops_render('member/login.html')
+
+    groupid = request.get_json().get('groupid')
+    caseId = request.get_json().get('caseId')
+    desc = request.get_json().get('desc')
+    if groupid == None or caseId == None or desc == None or groupid == '' or caseId == '' or desc == '':
+        return jsonify(**RetJson.retContent(RetJson.failCode, None, '用例id或者组id为空'))
+
+    ids = ','.join(caseId)
+
+    obj = {'caseids':ids, 'desc':desc}
+    db.session.query(CaseGroup).filter_by(id=groupid).update(obj)
+    db.session.commit()
+    return jsonify(**RetJson.retContent(RetJson.successCode, None, '用例组更新成功'))
+
+
+# 删除
+@case_page.route('/deleteGroup', methods=['POST'])
+def deleteGroup():
+    '''
+    {'groupid':'2','caseId':['33'], 'desc':'123'}
+    :return:
+    '''
+    is_login = check_login()
+    if is_login == False:
+        return ops_render('member/login.html')
+
+    groupId = request.get_json().get('groupid')
+
+    db.session.query(CaseGroup).filter_by(id=groupId).delete()
+    db.session.commit()
+    return jsonify(**RetJson.retContent(RetJson.successCode, None, '删除成功'))
+
+
+# 查看用户的组
+@case_page.route('/viewGroup', methods=['GET'])
+def viewGroup():
+    is_login = check_login()
+    if is_login == False:
+        return ops_render('member/login.html')
+
+    user_id = is_login.user_id
+
+    groups = db.session.query(CaseGroup.id, CaseGroup.caseids, CaseGroup.desc).filter_by(user_id=user_id)
+    ret = []
+    for group in groups:
+        temp = dict()
+        temp['desc'] = group.desc
+        temp['caseNum'] = len(group.caseids.split(','))
+        temp['groupid'] = group.id
+        ret.append(temp)
+
+    return jsonify(**RetJson.retContent(RetJson.successCode, ret))
+
+
+# 查看组下边的测试用例
+@case_page.route('/viewCaseUnderGroup', methods=['POST'])
+def viewCaseUnderGroup():
+    '''
+    {'groupid':'2'}
+    :return:
+    '''
+    is_login = check_login()
+    if is_login == False:
+        return ops_render('member/login.html')
+    user_id = is_login.user_id
+    groupid = request.get_json().get('groupid')
+
+    group = db.session.query(CaseGroup).filter_by(id=groupid).first()
+    caseids = group.caseids
+
+    caseids_list = caseids.split(',')
+
+    info = db.session.query(CoordinationCase.case_id,
+                            CoordinationCase.user_id,
+                            CoordinationCase.apiname,
+                            CoordinationCase.case_data,
+                            CoordinationCase.expected_results,
+                            CoordinationCase.ispj,
+                            CoordinationCase.remarks,
+                            CoordinationCase.explain,
+                            CoordinationCase.route
+                            ).filter(and_(CoordinationCase.case_id.in_(caseids_list), CoordinationCase.user_id==user_id))
+    if not info:
+        return redirect(UrlManager.UrlManager.buildUrl("/case_list"))
+
+    data = []
+
+    for i in info:
+        temp = dict()
+        temp['case_id'] = i.case_id
+        route = i.route
+        if route == None or route == '':
+            temp['apiname'] = ''
+        else:
+            temp['apiname'] = i.route.split('/')[-1]
+
+        temp['case_data'] = i.case_data
+        temp['expected_results'] = i.expected_results
+        # temp['apiname'] = i.apiname
+        temp['ispj'] = i.ispj
+        temp['remarks'] = i.remarks
+        temp['explain'] = i.explain
+        data.append(temp)
+
+    return jsonify(**RetJson.retContent(RetJson.successCode, data))
+
+
+# 一键执行组下边的所有用例
+@case_page.route('/runCaseUnderGroup', methods=['POST'])
+def runCaseUnderGroup():
+    '''
+    {'groupid':'2'}
+    :return:
+    '''
+    ret = []
+
+    is_login = check_login()
+    if is_login == False:
+        return ops_render('member/login.html')
+
+    groupid = request.get_json().get('groupid')
+    user_id = is_login.user_id
+    group = db.session.query(CaseGroup).filter_by(id=groupid).first()
+    caseids = group.caseids.split(',')
+
+    cases = db.session.query(CoordinationCase.param,
+                             CoordinationCase.case_id,
+                             CoordinationCase.route,
+                             CoordinationCase.case_data,
+                             Coordination.dataType,
+                             Coordination.method,
+                             CoordinationCase.expected_results).join(Coordination, Coordination.id==CoordinationCase.coordination_id).filter(CoordinationCase.case_id.in_(caseids))
+    for caseid in caseids:
+        for case in cases:
+            if caseid == str(case.case_id):
+                url = case.route
+                data = case.case_data
+                param = case.param
+                dataType = case.dataType
+                method = case.method
+                expected_results = case.expected_results
+
+                try:
+                    if method.lower() == 'get':
+                        res = requests.get(url, headers = header, params=param)
+                    else:
+
+                        if dataType.lower() == 'data':
+                            res = requests.post(url, headers = header, params=param, data = data)
+                        else:
+                            res = requests.post(url, headers = header, params=param, json = data)
+                except:
+                    return jsonify(**RetJson.retContent(RetJson.failCode, None, '用例id:{} 执行时发生错误'.format(case.case_id)))
+
+                temp = dict()
+                temp[case.case_id] = res.json()
+                ret.append(temp)
+
+
+
+    return jsonify(**RetJson.retContent(RetJson.successCode, ret))
+
 

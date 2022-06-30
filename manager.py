@@ -1,6 +1,5 @@
 # coding=utf-8
-#启动项
-from app import app
+
 from www import *
 from flask_script import Server
 from app import app,db,manager
