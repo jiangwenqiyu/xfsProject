@@ -168,16 +168,16 @@ def do_add():
 
 
 # @case_page.route("/mylist", methods=["GET", "POST"])
-def mylist():
-    is_login = check_login()
-    if is_login == False:
-        return ops_render('member/login.html')
-
-    info = CoordinationCase.query.filter_by(user_id=is_login.user_id)
-    if not info:
-        return redirect(UrlManager.UrlManager.buildUrl("/case_list"))
-
-    return ops_render('case/mylist.html', {"data": info})
+# def mylist():
+#     is_login = check_login()
+#     if is_login == False:
+#         return ops_render('member/login.html')
+#
+#     info = CoordinationCase.query.filter_by(user_id=is_login.user_id)
+#     if not info:
+#         return redirect(UrlManager.UrlManager.buildUrl("/case_list"))
+#
+#     return ops_render('case/mylist.html', {"data": info})
 
 
 @case_page.route("/mylist", methods=["GET", "POST"])
