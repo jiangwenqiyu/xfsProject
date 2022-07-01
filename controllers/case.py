@@ -1009,7 +1009,7 @@ def queryInfo():
 
     skuno = request.args.get('skuno')
 
-    sql = ''' select s1.spuNo, s2.skuNo, s1.productName, s1.brandName, s1.productType from product_main s1
+    sql = ''' select s1.spuNo, s2.skuNo, s1.productName, s1.brandName, s1.productType, s2.state from product_main s1
      left join product_sku s2 on s1.uuid = s2.productUuid
      where s2.skuNo = '{}'
      '''.format(skuno)
