@@ -7,6 +7,7 @@ from app import app,db,manager
 manager.add_command("runserver",Server(use_debugger=True,use_reloader=True))
 def main():
     manager.run()
+    # app.run()
 
 if __name__ == '__main__':
     #app.run(debug=True)

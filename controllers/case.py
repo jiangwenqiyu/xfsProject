@@ -3,22 +3,18 @@ import json
 import os
 from app import app, db
 from . import case_page
-from flask import request, redirect, g, jsonify, make_response
+from flask import request, redirect, g, jsonify, make_response, url_for
 from common.libs import helper, UrlManager
-from common.models.supplier import Supplier
-from common.models.suppliercase import SupplierCase
 from common.models.coordination import Coordination
 from common.models.coordinationcase import CoordinationCase
 from common.models.reportInfo import ReportInfo
 from common.models.system_info import SystemInfo
 from common.models.func_info import FuncInfo
 from common.models.CaseGroup import CaseGroup
-from common.models.auth_map import AuthMap
+from common.models.scene import Scene
 from common.RetJson import RetJson
 from common.libs.helper import ops_render
 from interceptors.Auth import check_login
-from common.libs.requery import requery
-from testmain import run
 from testmain import runway
 from sqlalchemy.sql import and_
 from exeCase.configPytest import RunPyTest
@@ -456,15 +452,13 @@ def do_addmodel():
 
 
 
-# 执行测试用例
+# 执行测试用例，按照场景执行
 @case_page.route('/exeCases', methods=['POST'])
 def exeCases():
     '''
-    接收参数：[{"func_id":1,"case":[排序好的用例id]}]
+    接收参数：[{"sceneid":1}]
     :return:
     '''
-
-
     is_login = check_login()
     if is_login == False:
         return ops_render('member/login.html')
@@ -477,16 +471,18 @@ def exeCases():
     # 报告名
     reportName = '测试报告_{}'.format(backContent)
 
-
     req = request.get_json()
 
-    finalData = dict()
-    for obj in req['caseids']:
-        caseids = obj['case']   # 已经排好序的
-        s = obj['func_id']
-        i = FuncInfo.query.filter_by(id=obj['func_id']).first()
-        func_name = i.name
+    finalData = dict()   # 最后传给pytest的数据结构
+    for scene in req:
+        sceneid = scene['sceneid']
+        scen = Scene.query.filter_by(id=sceneid).first()
+        if scen == None:
+            return jsonify(status = RetJson.failCode, msg='该场景不存在！')
+        caseids = scen.caseids.split(',')   # 场景下的用例
+        sceneName = scen.name               # 场景名
 
+        # 根据用例id列表，查询用例, 连用例表和模板表
         info = db.session.query(CoordinationCase.case_id,
                                 CoordinationCase.coordination_id,
                                 CoordinationCase.explain,
@@ -511,21 +507,21 @@ def exeCases():
             temp['explain'] = i.explain
 
             caseDict[i.case_id] = temp
-
         # 把用例进行排序
         caseOrder = list()
         try:
+
             for caseid in caseids:
-                caseOrder.append(caseDict[caseid])
-        except:
-            return jsonify(msg='id不存在,{}'.format(caseid))
+                caseOrder.append(caseDict[int(caseid)])
+
+        except Exception as e:
+            return jsonify(status=RetJson.failCode, msg='id不存在,{}'.format(caseid))
         else:
             # 排序之后存入返回变量 [{"模块名":caseOrder}]
-            finalData[func_name] = caseOrder
+            finalData[sceneName] = caseOrder
 
     # 当前文件的上级路径，系统绝对路径
     path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-
 
     # 保存测试报告到数据库
     report = ReportInfo()
@@ -544,10 +540,8 @@ def exeCases():
 
 
 
+    return jsonify(msg='执行成功,请前往查看测试报告')
 
-
-
-    return jsonify(msg='OK')
 
 
 
@@ -909,5 +903,131 @@ def runCaseUnderGroup():
 
 
     return jsonify(**RetJson.retContent(RetJson.successCode, ret))
+
+
+# 查看场景页面
+@case_page.route('/viewScene', methods=['GET'])
+def viewScene():
+    is_login = check_login()
+    if is_login == False:
+        return ops_render('member/login.html')
+
+    result = list(db.session.execute(''' select * from scene s where s.userid='{}' '''.format(is_login.user_id)))
+
+    data = []
+    for i in result:
+        temp = dict()
+        temp['id'] = i.id
+        temp['name'] = i.name
+        temp['userid'] = i.userid
+        temp['createTime'] = i.createTime
+        temp['updateTime'] = i.updateTime
+
+        if i.caseids == '':
+            temp['caseids'] = 0
+        else:
+            t = i.caseids
+            t = t.split(',')
+            temp['caseids'] = len(t)
+        data.append(temp)
+
+
+    return ops_render('scene/scene.html', {'data':data})
+
+
+# 添加场景
+@case_page.route('/addScene', methods=['POST'])
+def addScene():
+    '''
+    接收参数:sceneName
+    :return:
+    '''
+    is_login = check_login()
+    if is_login == False:
+        return ops_render('member/login.html')
+
+    sceneName = request.form.get('sceneName')
+    user_id = is_login.user_id
+    if sceneName:
+        s = Scene()
+        s.name = sceneName
+        s.userid = user_id
+        db.session.add(s)
+        db.session.commit()
+        return redirect(url_for('case.viewScene'))
+        # return jsonify(status=RetJson.successCode, msg='添加场景成功', data={'sceneid': s.id, 'sceneName': s.name, 'caseNum':0, 'createTime':s.createTime.strftime("%Y-%m-%d %H:%M:%S"), 'updateTime':s.updateTime.strftime("%Y-%m-%d %H:%M:%S")})
+    else:
+        return jsonify(status=RetJson.failCode, msg='场景名称必传')
+
+
+# 编辑场景添加用例
+@case_page.route('/editScene', methods=['GET'])
+def editScene():
+    is_login = check_login()
+    if is_login == False:
+        return ops_render('member/login.html')
+
+    sceneid = request.args.get('scenceid')
+    scene = Scene.query.filter_by(id = sceneid).first()
+    caseids = scene.caseids.split(',')
+
+
+
+    data = dict()
+    data['name'] = scene.name
+    data['id'] = sceneid
+
+    return ops_render('/scene/editScene.html')
+
+
+# 删除场景
+@case_page.route('/deleteScene', methods=['POST'])
+def deleteScene():
+    is_login = check_login()
+    if is_login == False:
+        return ops_render('member/login.html')
+    print('what')
+    req = request.get_json()
+    sceneids = []
+    for i in req:
+        sceneids.append(i['sceneid'])
+
+    Scene.query.filter(Scene.id.in_(sceneids)).delete()
+    db.session.commit()
+
+    return jsonify(status=RetJson.successCode, msg = '删除成功')
+
+
+# 临时查商品，曹宁用，完事删
+@case_page.route('/queryInfo', methods=['GET'])
+def queryInfo():
+    import pymysql
+    import requests
+
+    con = pymysql.connect(host = '192.168.0.31', port = 3307, user = 'usercenter', password = 'usercenter123!', database = 'xfs_product_70w')
+    cur = con.cursor()
+
+    skuno = request.args.get('skuno')
+
+    sql = ''' select s1.spuNo, s2.skuNo, s1.productName, s1.brandName, s1.productType from product_main s1
+     left join product_sku s2 on s1.uuid = s2.productUuid
+     where s2.skuNo = '{}'
+     '''.format(skuno)
+    cur.execute(sql)
+    d = cur.fetchone()
+
+    data = dict()
+    data['basicInfo'] = d
+
+    url = 'http://product.t4.xinfangsheng.com/srm/service/product/price/cityPrice'
+    dd = {
+        "skuNos": [
+            skuno
+        ]
+    }
+    res = requests.post(url, json=dd).json()
+    data['price'] = res['retData']
+
+    return ops_render('temp_delete.html', data)
 
 
