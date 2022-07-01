@@ -1,0 +1,116 @@
+{% extends "/common/layout.html" %}
+
+{% block content %}
+    {# 添加场景的js   #}
+
+
+    <form method="post" action="/case/addScene" target="_self">
+        <input type="text" value="" name="sceneName" class="sceneName">
+        <button id="addScene" type="submit">添加场景</button>
+    </form>
+
+
+    <table style="margin-top: 20px">
+        <thead>
+            <tr bgcolor="yellow">
+                <td style="padding-right: 140px;">场景名称</td>
+                <td style="padding-right: 140px;">用例数量</td>
+                <td style="padding-right: 140px;">创建人</td>
+                <td style="padding-right: 140px;">创建时间</td>
+                <td style="padding-right: 140px;">修改时间</td>
+                <td style="padding-right: 140px;">操作</td>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for i in data %}
+                <tr style="height: 30px" sceneid="{{ i.id }}">
+                    <td>{{ i.name }}</td>
+                    <td>{{ i.caseids }}</td>
+                    <td>{{ i.userid }}</td>
+                    <td>{{ i.createTime }}</td>
+                    <td>{{ i.updateTime }}</td>
+                    <td>
+                        <a href="/case/editScene?scenceid={{ i.id }}" target="_blank" style="padding-right: 20px">编辑</a>
+                        <a href="#" style="padding-right: 20px" class="exeCases">执行</a>
+                        <a href="#" class="deleteScene">删除</a>
+                    </td>
+                </tr>
+
+            {% endfor %}
+
+        </tbody>
+    </table>
+
+
+    <script>
+        $('#addScene').click(function () {
+            var sceneName = $('.sceneName').val();
+            if (sceneName.trim() == '') {
+                alert("场景名必填");
+                $('#addScene').attr("type", "reset");
+            } else {
+                $('#addScene').attr("type", "submit");
+            }
+        });
+
+        $(".exeCases").click(function () {
+            var num = $(this).parent().parent().children('td').eq(1).html();
+
+            if (num == 0) {
+                alert('该场景下没有用例，无法执行');
+
+            } else {
+
+                var sceneid = $(this).parent().parent().attr("sceneid")
+
+                $.ajax({
+                    url: '/case/exeCases',
+                    type: 'post',
+                    dataType: 'json',
+                    contentType: 'application/json',
+                    data: JSON.stringify([{"sceneid":sceneid}]),
+                    success: function (resp) {
+                        alert(resp.msg);
+                    }
+                });
+
+            }
+            });
+
+
+
+
+        $(".deleteScene").click(function () {
+            var num = $(this).parent().parent().children('td').eq(1).html();
+            if (num != 0) {
+
+                alert('该场景存在用例，不允许删除！');
+
+            } else {
+                var sceneid = $(this).parent().parent().attr("sceneid")
+
+                var currentTr = $(this).parent().parent();
+
+                $.ajax({
+                    url: '/case/deleteScene',
+                    type: 'post',
+                    dataType: 'json',
+                    contentType: 'application/json',
+                    data: JSON.stringify([{"sceneid":sceneid}]),
+                    success: function (resp) {
+                        alert(resp.msg);
+                        if (resp.status == 0) {
+                            // 删除成功之后，从页面干掉
+                            currentTr.remove();
+                        }
+
+                    }
+                });
+
+            }
+        });
+
+
+    </script>
+{% endblock %}

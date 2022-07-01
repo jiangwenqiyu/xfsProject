@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="https://cdn.staticfile.org/jquery/1.10.2/jquery.min.js"></script>
+</head>
+<body>
+
+<div><span>sku：</span><input type="text" id="skuno">
+    <button id="query">查询</button></div>
+
+<div>
+    <table>
+        <thead>
+        <tr>
+            <td  style="padding-right: 80px">spu</td>
+            <td  style="padding-right: 80px">sku</td>
+            <td  style="padding-right: 80px">商品名称</td>
+            <td  style="padding-right: 80px">品牌</td>
+            <td  style="padding-right: 80px">商品类型</td>
+            <td  style="padding-right: 80px">上下架</td>
+        </tr>
+        </thead>
+
+            
+        <tbody>
+            <td>{{ basicInfo[0] }}</td>
+            <td>{{ basicInfo[1] }}</td>
+            <td>{{ basicInfo[2] }}</td>
+            <td>{{ basicInfo[3] }}</td>
+            <td>{{ basicInfo[4] }}</td>
+            <td>{{ basicInfo[5] }}</td>
+
+        </tbody>
+    </table>
+
+
+
+    <table style="margin-top: 100px">
+        <thead>
+        <tr>
+            <td style="padding-right: 80px">sku</td>
+            <td style="padding-right: 80px">区域</td>
+            <td style="padding-right: 80px">省</td>
+            <td style="padding-right: 80px">城市</td>
+            <td style="padding-right: 80px">成本价</td>
+            <td style="padding-right: 80px">现金价</td>
+            <td style="padding-right: 80px">分销价</td>
+            <td style="padding-right: 80px">售价</td>
+        </tr>
+        </thead>
+
+        
+        <tbody>
+        {% for i in price %}
+            <tr>
+                <td>{{ i.skuNo }}</td>
+                <td>{{ i.areaName }}</td>
+                <td>{{ i.provinceName }}</td>
+                <td>{{ i.cityName }}</td>
+                <td>{{ i.costPrice }}</td>
+                <td>{{ i.cashPrice }}</td>
+                <td>{{ i.cashDistribMoney }}</td>
+                <td>{{ i.salePrice }}</td>
+            </tr>
+            
+        {% endfor %}
+
+        </tbody>
+    </table>
+
+
+
+
+
+</div>
+
+<script>
+    $("#query").click(function () {
+        $(location).attr('href', '/case/queryInfo?skuno='+$("#skuno").val());
+
+
+
+
+    });
+
+</script>
+
+</body>
+</html>
