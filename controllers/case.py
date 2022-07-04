@@ -986,13 +986,20 @@ def deleteScene():
     is_login = check_login()
     if is_login == False:
         return ops_render('member/login.html')
-    print('what')
+
     req = request.get_json()
     sceneids = []
     for i in req:
         sceneids.append(i['sceneid'])
 
-    Scene.query.filter(Scene.id.in_(sceneids)).delete()
+    sceneinfo = Scene.query.filter(Scene.id.in_(sceneids))
+    for i in sceneinfo.all():
+        if i.caseids == '' or i.caseids == None:
+            pass
+        else:
+            return jsonify(status=RetJson.failCode, msg = '{}:场景下存在用例，不允许删除'.format(i.name))
+
+    sceneinfo.delete()
     db.session.commit()
 
     return jsonify(status=RetJson.successCode, msg = '删除成功')
