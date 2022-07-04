@@ -973,22 +973,26 @@ def editScene():
     scene = Scene.query.filter_by(id = sceneid).first()
     caseids = scene.caseids.split(',')
 
-    sql = '''
-    select ca.case_id, ca.explain, sys.name, func.name from coordination_case ca
-    left join coordination m on m.id = ca.coordination_id
-    left join func_info func on func.id = m.func_id
-    left join system_info sys on sys.id = func.system_id
-    where ca.case_id in {}
-    '''.format(tuple(caseids))
-    caseinfo = db.session.execute(sql)
+    if caseids[0] == '':
+        caseinfo = []
+    else:
+        sql = '''
+        select ca.case_id, ca.explain, sys.name, func.name from coordination_case ca
+        left join coordination m on m.id = ca.coordination_id
+        left join func_info func on func.id = m.func_id
+        left join system_info sys on sys.id = func.system_id
+        where ca.case_id in {}
+        '''.format(tuple(caseids))
 
-    infodict = dict()
-    for i in caseinfo:
-        infodict[i[0]] = i
+        caseinfo = db.session.execute(sql)
 
-    caseinfo = []
-    for i in caseids:
-        caseinfo.append(infodict[int(i)])
+        infodict = dict()
+        for i in caseinfo:
+            infodict[i[0]] = i
+
+        caseinfo = []
+        for i in caseids:
+            caseinfo.append(infodict[int(i)])
 
     data = dict()
     data['name'] = scene.name
@@ -1044,6 +1048,7 @@ def relateQueryCase():
     caseSys = req.get('caseSys').strip()
     caseFunc = req.get('caseFunc').strip()
     isupdate = req.get('isupdate')  #redis的sql缓存
+
     if isupdate or redis_store.get("{}_sql".format(is_login.user_id)) is None:
         # 点的查询，需要更新缓存
         if caseName == '' and caseSys == '' and caseFunc == '':
@@ -1064,12 +1069,10 @@ def relateQueryCase():
             where ca.user_id = '{}'
             '''.format(is_login.user_id)
         else:
-            if caseName != '':
-                caseName = '%{}%'.format(caseName)
-            if caseSys != '':
-                caseSys = '%{}%'.format(caseSys)
-            if caseFunc != '':
-                caseFunc = '%{}%'.format(caseFunc)
+
+            caseName = '%{}%'.format(caseName) if caseName != '' else '123@*&&^%%'
+            caseSys = '%{}%'.format(caseSys) if caseSys != '' else '123@*&&^%%'
+            caseFunc = '%{}%'.format(caseFunc) if caseFunc != '' else '123@*&&^%%'
 
 
             sql = '''
@@ -1090,6 +1093,7 @@ def relateQueryCase():
             '''.format(is_login.user_id, caseName, caseSys, caseFunc)
         redis_store.setex('{}_sql'.format(is_login.user_id), constance.REDIS_RES_EXPIRE, sql)
         redis_store.setex('{}_csql'.format(is_login.user_id), constance.REDIS_RES_EXPIRE, c_sql)
+        print(sql)
     else:
         # 不需要更新缓存，直接从缓存拿出来，直接用  (其实就是不点查询按钮的走这儿)
         sql = redis_store.get("{}_sql".format(is_login.user_id)).decode()
