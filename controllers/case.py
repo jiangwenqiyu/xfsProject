@@ -1,7 +1,7 @@
 # coding=utf-8
 import json
 import os
-from app import app, db
+from app import app, db, redis_store
 from . import case_page
 from flask import request, redirect, g, jsonify, make_response, url_for
 from common.libs import helper, UrlManager
@@ -23,6 +23,8 @@ import requests
 import jmespath
 import datetime
 import time
+from config import constance
+import re
 
 
 header = header = {'contenType':'application/json',
@@ -971,13 +973,29 @@ def editScene():
     scene = Scene.query.filter_by(id = sceneid).first()
     caseids = scene.caseids.split(',')
 
+    sql = '''
+    select ca.case_id, ca.explain, sys.name, func.name from coordination_case ca
+    left join coordination m on m.id = ca.coordination_id
+    left join func_info func on func.id = m.func_id
+    left join system_info sys on sys.id = func.system_id
+    where ca.case_id in {}
+    '''.format(tuple(caseids))
+    caseinfo = db.session.execute(sql)
 
+    infodict = dict()
+    for i in caseinfo:
+        infodict[i[0]] = i
+
+    caseinfo = []
+    for i in caseids:
+        caseinfo.append(infodict[int(i)])
 
     data = dict()
     data['name'] = scene.name
     data['id'] = sceneid
+    data['caseinfo'] = caseinfo
 
-    return ops_render('/scene/editScene.html')
+    return ops_render('/scene/editScene.html', {'data':data})
 
 
 # 删除场景
@@ -1003,6 +1021,127 @@ def deleteScene():
     db.session.commit()
 
     return jsonify(status=RetJson.successCode, msg = '删除成功')
+
+
+@case_page.route('/relateQueryCase', methods=['POST'])
+def relateQueryCase():
+    '''
+    默认每页展示10条，不可改
+    nowPage:
+    caseName:
+    caseSys:
+    caseFunc:
+    :return:
+    '''
+    is_login = check_login()
+    if is_login == False:
+        return ops_render('member/login.html')
+
+
+    req = request.get_json()
+    nowPage = int(req.get('nowPage').strip())
+    caseName = req.get('caseName').strip()
+    caseSys = req.get('caseSys').strip()
+    caseFunc = req.get('caseFunc').strip()
+    isupdate = req.get('isupdate')  #redis的sql缓存
+    if isupdate or redis_store.get("{}_sql".format(is_login.user_id)) is None:
+        # 点的查询，需要更新缓存
+        if caseName == '' and caseSys == '' and caseFunc == '':
+            sql = '''
+            select ca.case_id, ca.explain, sys.name, func.name from coordination_case ca
+            left join coordination model on model.id = ca.coordination_id
+            left join func_info func on func.id = model.func_id
+            left join system_info sys on sys.id = func.system_id
+            where ca.user_id = '{}'
+            limit {}, 10
+            '''.format(is_login.user_id, (nowPage - 1) * 10)
+
+            c_sql = '''
+            select count(1) from coordination_case ca
+            left join coordination model on model.id = ca.coordination_id
+            left join func_info func on func.id = model.func_id
+            left join system_info sys on sys.id = func.system_id
+            where ca.user_id = '{}'
+            '''.format(is_login.user_id)
+        else:
+            if caseName != '':
+                caseName = '%{}%'.format(caseName)
+            if caseSys != '':
+                caseSys = '%{}%'.format(caseSys)
+            if caseFunc != '':
+                caseFunc = '%{}%'.format(caseFunc)
+
+
+            sql = '''
+            select ca.case_id, ca.explain, sys.name, func.name from coordination_case ca
+            left join coordination model on model.id = ca.coordination_id
+            left join func_info func on func.id = model.func_id
+            left join system_info sys on sys.id = func.system_id
+            where ca.user_id = '{}' and (ca.explain like '{}' or sys.name like '{}' or func.name like '{}')
+            limit {}, 10
+            '''.format(is_login.user_id, caseName, caseSys, caseFunc, (nowPage - 1) * 10)
+
+            c_sql = '''
+            select count(1) from coordination_case ca
+            left join coordination model on model.id = ca.coordination_id
+            left join func_info func on func.id = model.func_id
+            left join system_info sys on sys.id = func.system_id
+            where ca.user_id = '{}' and (ca.explain like '{}' or sys.name like '{}' or func.name like '{}')
+            '''.format(is_login.user_id, caseName, caseSys, caseFunc)
+        redis_store.setex('{}_sql'.format(is_login.user_id), constance.REDIS_RES_EXPIRE, sql)
+        redis_store.setex('{}_csql'.format(is_login.user_id), constance.REDIS_RES_EXPIRE, c_sql)
+    else:
+        # 不需要更新缓存，直接从缓存拿出来，直接用  (其实就是不点查询按钮的走这儿)
+        sql = redis_store.get("{}_sql".format(is_login.user_id)).decode()
+        pat = 'limit \d+, 10'
+        sql = re.sub(pat, 'limit {}, 10'.format((nowPage-1)*10), sql)
+        re.sub
+        print(sql)
+        c_sql = redis_store.get("{}_csql".format(is_login.user_id)).decode()
+
+    ret = list(db.session.execute(sql))
+    for i in range(len(ret)):
+        ret[i] = list(ret[i])
+
+    totalNum = list(db.session.execute(c_sql))[0][0]
+    totalPage = int(totalNum/10) if totalNum % 10 == 0 else int(totalNum/10) + 1
+    return jsonify(status=RetJson.successCode, data=ret, totalPage = totalPage, totalNum = totalNum, nowPage = nowPage)
+
+
+# 编辑场景信息
+@case_page.route('/saveEditScene', methods=['POST'])
+def saveEditScene():
+    '''
+    sceneid:
+    sceneName:
+    caseids:1,2
+    :return:
+    '''
+    is_login = check_login()
+    if is_login == False:
+        return ops_render('member/login.html')
+
+    req = request.get_json()
+    sceneid = req.get('sceneid')
+    sceneName = req.get('sceneName')
+    caseids = req.get('caseids')
+
+    sql = '''
+    update scene s set s.name='{}', s.caseids='{}' where s.id={}
+    '''.format(sceneName, caseids, sceneid)
+    db.session.execute(sql)
+    try:
+        db.session.commit()
+    except:
+        db.session.rollback()
+        return jsonify(status=RetJson.failCode, msg='数据库插入失败！')
+    return jsonify(status=RetJson.successCode, msg='保存成功！')
+
+
+
+
+
+
 
 
 # 临时查商品，曹宁用，完事删

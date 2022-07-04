@@ -4,3 +4,5 @@
 返回值存入redis格式：用例id_param|data|res, 存入redis的，值都是序列化后的字符串
 可支持的解析格式：#用例id_param|data|res_jmespath#    $系统提供的一些指定函数$
 例：{"productnName":"20_res_retData[0].productnName"}
+
+
