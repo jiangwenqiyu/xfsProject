@@ -1,7 +1,88 @@
 {% extends "/common/layout.html" %}
 {% block content %}
 
-<div><span>场景名称：</span><input type="text" value=""></div>
+<div sceneid="{{ data.id }}" id="sceneid"><span>场景名称：</span><input type="text" value="{{ data.name }}" id="sceneName">
+    <button style="float: right" id = 'saveSence'>保存</button>
+    <button style="float: right;margin-right: 50%;" type="button"  data-toggle="modal" data-target="#relateCase" class="relateCase">关联用例</button>
+</div>
 
 
+    <!-- 这是弹出框页面 -->
+    <div class="modal fade" id="relateCase" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel">关联测试用例</h4>
+                </div>
+
+                <div>
+                    <span>用例名称：</span><input type="text" name="caseName" class="caseName">
+                    <span >所属系统：</span><input type="text" name="caseSys" class="caseSys">
+                    <br>
+                    <span style="margin-top: 10px">所属功能：</span><input type="text" style="margin-top: 10px" name="caseFunc" class="caseFunc">
+                    <button style="float: right;margin-top: 10px;margin-right: 10%" class="btn btn-primary query-case">查询</button>
+                </div>
+
+                <div class="modal-body">
+                    <table class="table queryCase" >
+                        <thead>
+                            <tr>
+                                <td>id</td>
+                                <td>用例名称</td>
+                                <td>所属系统</td>
+                                <td>所属功能</td>
+                                <td>操作</td>
+                            </tr>
+                        </thead>
+                        <tbody>
+
+
+                        </tbody>
+                    </table>
+                    <span style='margin-left: 40%;margin-bottom: 20px'></span>
+                    <input type="text" style="width: 30px;margin-left: 5px;margin-right: 5px" id="jump" value="1">
+                    
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">确定</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+{#    下边是编辑页面的table#}
+    <table class="table" style="margin-top: 20px" id="editCaseIndex">
+        <thead>
+        <tr>
+            <th>用例id</th>
+            <th>用例名称</th>
+            <th>所属系统</th>
+            <th>所属功能</th>
+            <th>操作</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for i in data.caseinfo %}
+            <tr>
+                <td>{{ i[0] }}</td>
+                <td><a href="/case/editcase?case_id={{ i[0] }}" target="_blank">{{ i[1] }}</a></td>
+                <td>{{ i[2] }}</td>
+                <td>{{ i[3] }}</td>
+                <td><a href="#" class="deleteCase">删除</a></td>
+            </tr>
+        {% endfor %}
+
+
+        </tbody>
+    </table>
+
+
+{% endblock %}
+
+{% block js %}
+    <script src="{{ buildStaticUrl('/js/scene/editScene.js') }}"></script>
+    <script src="{{ buildStaticUrl('/js/jq_ui/jquery-ui.js') }}"></script>
 {% endblock %}
