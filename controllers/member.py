@@ -1,18 +1,26 @@
 # coding=utf-8
 from app import app,db
 from . import member_page
-from flask import request,make_response,redirect
+from flask import request,make_response,redirect, url_for
 from common.libs import helper, UrlManager
 from common.models.user import User
 from common.libs import UserService
 from common.libs.helper import ops_render
-from flask import session
+from interceptors.Auth import check_login
 
 
 @member_page.route("/login",methods = ["GET","POST"])
 def login():
     if request.method == "GET":
-        return ops_render('member/login.html')
+        is_login = check_login()
+        if is_login != False:
+            return redirect(url_for('case.mylist'))
+        else:
+            return ops_render('member/login.html')
+
+
+
+
 
     req = request.values
     login_name = req["login_name"] if "login_name" in req else ""

@@ -7,10 +7,10 @@ var member_login_ops = {
         $(".login_wrap .do-login").click(function () {
 
             var btn_target = $(this);
-            if (btn_target.hasClass("disabled")) {
-                alert("稍等户，正处理呢～");
-                return;
-            }
+            // if (btn_target.hasClass("disabled")) {
+            //     alert("稍等户，正处理呢～");
+            //     return;
+            // }
 
 
             var login_name = $(".login_wrap input[name = login_name]").val();
@@ -22,8 +22,8 @@ var member_login_ops = {
             }
             ;
             */
-            alert(login_name)
-            btn_target.addClass("disabled");
+            // alert(login_name)
+            // btn_target.addClass("disabled");
             if (login_name == "undefined" || login_name.length<1) {
                 common_ops.alert("请输入正确用户名或密码")
                 return;
@@ -44,15 +44,20 @@ var member_login_ops = {
                 },
                 dataType:'json',
                 success:function (res) {
-                    btn_target.removeClass("disabled");
+                    // btn_target.removeClass("disabled");
                     var callback = null;
-                    if(res.code = 200){
-                        callback = function(){
+                    if (res.code == 200) {
+                        callback = function () {
                             window.location = common_ops.buildUrl("/");
                         };
+                        common_ops.alert(res.msg, callback);
 
+
+                    } else {
+                        common_ops.alert(res.msg);
                     }
-                    common_ops.alert(res.msg,callback)
+
+
                 }
             })
 
