@@ -48,7 +48,7 @@ class Common(OfferFunction):
                 redis_value = redis_store.get(redis_key)
                 redis_value_json = json.loads(redis_value)
                 sub_value = jmespath.search(jmespath_express, redis_value_json)
-                d = d.replace(replaceword, sub_value)
+                d = d.replace('#{}#'.format(replaceword), sub_value)
 
             return json.loads(d)
 
@@ -65,7 +65,7 @@ class Common(OfferFunction):
             for func in result:
                 func_name = func.replace('$', '')
                 func_value = self.func_map[func_name]()
-                d = d.replace(func, func_value)
+                d = d.replace(func, str(func_value))
             return json.loads(d)
 
 

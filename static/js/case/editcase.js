@@ -1,6 +1,10 @@
 $('.do_add').click(function () {
+    var temp = $("#data").clone();
+    temp.find('.collapser').remove()
+
+
     param = $("#param").text()
-    data = $("#data").text()
+    data = temp.text()
     assert = $("#assert").text()
     explain = $("#explain").val();
     caseid = $(".case_id").text();

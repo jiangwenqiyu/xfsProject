@@ -11,14 +11,26 @@ function format() {
 
 
 $('.do_add').click(function () {
+
+    var temp = $("#data").clone();
+    var t = temp.find('.collapser').remove();
+
+
     // 保存测试用例
     route = $(".apiname").attr("caseurl");
     param = $("#param").text();
-    data = $("#data").text();
+    // data = $("#data").text();
+    data = temp.text();
     exp = $("#assert").text();
     explain = $("#explain").val();
     apiname = $(".apiname").attr("apiname");
     coordinationId = $(".apiname").attr("coordinationId");
+
+    // 必填校验
+    if (data == '' || exp == '' || explain == '') {
+        alert('有必填项为空');
+        return;
+    }
 
     $.ajax({
         url: '/case/do_add',
