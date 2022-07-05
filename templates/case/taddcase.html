@@ -30,21 +30,21 @@
         <div class="col-lg-8 col-lg-offset-2">
             <div class="panel panel-default">
                 <div class="panel-heading apiname" coordinationId="{{ id | safe }}" apiname='{{ info.apiname | safe }}' caseurl="{{  url | safe }}">{{ info.apiname | safe }}: : {{ url | safe}}</div>
-                <p class="navbar-text "><a
-                        href="{{ buildUrl('/case/case_list') }}" class="navbar-link">返回接口列表</a></p>
-
-
-                <div class="radio navbar-center ">
-                    {% if pjlist %}
-                        {% for item in pjlist %}
-                            <label>
-                                <input class="pjname" type="radio" name="optionsRadios" id="optionsRadios1"
-                                       value={{ item | safe }} checked>
-                                {{ item | safe }}
-                            </label>
-                        {% endfor %}
-                    {% endif %}
-                </div>
+{#                <p class="navbar-text "><a#}
+{#                        href="{{ buildUrl('/case/case_list') }}" class="navbar-link">返回接口列表</a></p>#}
+{##}
+{##}
+{#                <div class="radio navbar-center ">#}
+{#                    {% if pjlist %}#}
+{#                        {% for item in pjlist %}#}
+{#                            <label>#}
+{#                                <input class="pjname" type="radio" name="optionsRadios" id="optionsRadios1"#}
+{#                                       value={{ item | safe }} checked>#}
+{#                                {{ item | safe }}#}
+{#                            </label>#}
+{#                        {% endfor %}#}
+{#                    {% endif %}#}
+{#                </div>#}
 
 
                 <div class="panel-body">
@@ -98,7 +98,7 @@
 
                         <div class="form-group">
                             <div class="col-sm-offset-2 col-sm-10">
-                                <button type="submit" class="btn btn-success btn-block do_add">走你</button>
+                                <button type="submit" class="btn btn-success btn-block do_add">保存用例</button>
                             </div>
                         </div>
                     </div>

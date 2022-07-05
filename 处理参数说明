@@ -6,3 +6,7 @@
 例：{"productnName":"20_res_retData[0].productnName"}
 
 
+
+使用说明：
+所有参数都是必填
+断言:{"数据类型_jmespath表达式:预期结果"},例:{"string_retData.data.name":"测试","int_retData.data.name":1}
