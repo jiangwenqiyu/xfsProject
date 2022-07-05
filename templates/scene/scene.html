@@ -10,21 +10,21 @@
     </form>
 
 
-    <table style="margin-top: 20px">
+    <table style="margin-top: 20px" class="table table-hover">
         <thead>
-            <tr bgcolor="yellow">
-                <td style="padding-right: 140px;">场景名称</td>
-                <td style="padding-right: 140px;">用例数量</td>
-                <td style="padding-right: 140px;">创建人</td>
-                <td style="padding-right: 140px;">创建时间</td>
-                <td style="padding-right: 140px;">修改时间</td>
-                <td style="padding-right: 140px;">操作</td>
+            <tr>
+                <th style="padding-right: 140px;">场景名称</th>
+                <th style="padding-right: 140px;">用例数量</th>
+                <th style="padding-right: 140px;">创建人</th>
+                <th style="padding-right: 140px;">创建时间</th>
+                <th style="padding-right: 140px;">修改时间</th>
+                <th style="padding-right: 140px;">操作</th>
             </tr>
         </thead>
 
         <tbody>
             {% for i in data %}
-                <tr style="height: 30px" sceneid="{{ i.id }}">
+                <tr sceneid="{{ i.id }}">
                     <td>{{ i.name }}</td>
                     <td>{{ i.caseids }}</td>
                     <td>{{ i.userid }}</td>
