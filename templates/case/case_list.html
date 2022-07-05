@@ -119,7 +119,7 @@
                     method: 'post',
                     dataType: 'json',
                     contentType: 'application/json',
-                    data: JSON.stringify({'model_id':[model_id]}),
+                    data: JSON.stringify({'model_id':model_id}),
                     success: function (resp) {
                         if (resp.msg == "删除成功") {
                             currentDiv.remove()

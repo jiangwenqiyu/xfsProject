@@ -557,35 +557,60 @@ def deleteCases():
 
     req = request.get_json()
     ids = req.get('caseId')
-    if ids == None:
-        return  jsonify(msg = '没有获取到入参')
+    if ids == None or ids == []:
+        return  jsonify(status = RetJson.failCode, msg = '没有获取到入参')
 
-    print(ids,'*************************************')
+    # 判断用例是否在场景中
+    sql = '''
+    select s.caseids from scene s
+    '''
+    result = list(db.session.execute(sql))
+    templist = list()
+    for i in result:
+        if i[0] != '':
+            templist.extend(i[0].split(','))
+    tempset = set(templist)
+    for i in ids:
+        if str(i) in tempset:
+            return jsonify(status=RetJson.failCode, msg='id:{},已被场景占用'.format(i))
+
+
+
     db.session.query(CoordinationCase).filter(CoordinationCase.case_id.in_(ids)).delete()
     db.session.commit()
-    return jsonify(msg='删除成功')
+    return jsonify(status = RetJson.failCode, msg='删除成功')
 
 
 # 删除测试用例模板
 @case_page.route('/deletemodel', methods=['POST'])
 def deleteModel():
     '''
-    接收用例id列表，进行删除  {caseId:[]}
+    接收用例id列表，进行删除  {model_id:[]}
     :return:
     '''
 
     req = request.get_json()
     model_id = req.get('model_id')
     if model_id == None:
-        return  jsonify(msg = '没有获取到入参')
+        return  jsonify(status=RetJson.failCode, msg = '没有获取到入参')
 
-    db.session.query(Coordination).filter(Coordination.id==model_id).delete()
-    try:
-        db.session.commit()
-        return jsonify(msg='删除成功')
-    except:
-        db.session.rollback()
-        return jsonify(msg='删除失败')
+    # 判断模板下是否有用例
+    sql = '''
+    select * from coordination s1
+    right join coordination_case s2 on s1.id = s2.coordination_id
+    where s1.id='{}' 
+    '''.format(model_id)
+    data = list(db.session.execute(sql))
+    if data == ():
+        db.session.query(Coordination).filter(Coordination.id==model_id).delete()
+        try:
+            db.session.commit()
+            return jsonify(status=RetJson.failCode, msg='删除成功')
+        except:
+            db.session.rollback()
+            return jsonify(status=RetJson.failCode, msg='删除失败')
+    else:
+        return jsonify(status=RetJson.failCode, msg='模板下存在用例，不允许删除')
 
 
 
