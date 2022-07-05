@@ -1,4 +1,6 @@
 {% extends "/common/layout.html" %}
+
+
 {% block content %}
     <div>
         <ul class="nav nav-pills nav-stacked">
@@ -53,12 +55,35 @@
             })
         }
 
-        function getThirdContent(obj) {
 
+        function getThirdContent(obj) {
 
 
             // 先清空三级的内容
             $('#third').html('');
+
+            // 生成table
+            var table = "" +
+                "<table class='table table-hover table-bordered' style='table-layout: fixed'>" +
+                "<thead>" +
+                "<tr>" +
+                "<th class='center'>用例id</thclass>" +
+                "<th class='center'>接口名称</thclass>" +
+                "<th class='center'>用例说明</thclass>" +
+                "<th class='center' width='20%'> 结果</thclass>" +
+                "<th>操作</th>" +
+                "</tr>" +
+                "</thead>" +
+                "" +
+                "<tbody>" +
+                "" +
+                "</tbody>" +
+                "" +
+                "</table>" +
+                ""
+
+            $('#third').append(table);
+
             sid = $(obj).attr('s-id');
             $.ajax({
                 url: '/case/getThirdContent_case',
@@ -75,31 +100,23 @@
                         explain = resp.data[x].explain
                         apiname = resp.data[x].apiname
 
-                        var content = '<div class="form-horizontal param_wrap " style="float: left">'
-                        content += '<div class="panel panel-success col-md-12">'
-                        content += '<div class="panel-body">'
-                        content += '<div class="input-group " >'
-                        content += '<span class="input-group-addon ">'
-                        content += '<input type="checkbox" aria-label="..." name="choose" value=' + case_id + '>'
-                        content += '</span>'
-                        content += '<div class="list-group">'
-                        content += '<a href="/case/editcase?case_id=' + case_id + '" class="list-group-item">'
-                        content += '<h4 class="list-group-item-heading ">' + apiname + '</h4>'
-                        content += '<p style="display: none" class="allcase">' + case_id + '</p>'
-                        content += '<p class="list-group-item-text ' + case_id + ' " id="case_id">用例ID:' + case_id + '</p>'
-                        content += '<p class="list-group-item-text">用例说明：' + explain + '</p>'
-0                        {#content += '<div class="row">'#}
-                        {#content += '</div>'#}
-                        content += '</a>'
-                        content += '<div class="pull-right">'
-                        content += '<button type="submit" class="btn btn-success btn-block do-test" name=' + case_id +  '>测试</button>'
-                        content += '<button type="submit" class="btn btn-success btn-block do-delete" name=' + case_id +  '>删除</button>'
-                        content += '</div>'
-                        content += '</div>'
-                        content += '</div>'
-                        content += '</div>'
+                        var temp = "<tr>" +
+                            "<td>" + case_id + "</td>" +
 
-                        $('#third').append(content);
+                            "<td>" + apiname + "</td>" +
+
+                            "<td><a href='/case/editcase?case_id=" + case_id + "' target='_blank'>"+explain+"</a></td>" +
+
+                            "<td class='try-gan' style='overflow: hidden;text-overflow:ellipsis;white-space: nowrap'></td>" +
+
+                            "<td>" +
+                            "<div><a href='javascript:void(0)' class='btn do-test' name='"+case_id+"'>测试</a></div>" +
+                            "<div><a href='javascript:void(0)' name='"+case_id+"' class='btn do-delete'>删除</a></div>" +
+                            "</td>" +
+
+                            "</tr>"
+
+                        $('tbody').append(temp);
                     }
 
                 }
@@ -107,25 +124,34 @@
             })
         }
 
+        $('.try-gan').poshytip();
+
 
         // 注册热键,删除功能
         $(document).on('click', '.do-delete', function () {
-            var caseId = $(this).attr('name');
-            var currentDiv = $(this).parent().parent().parent().parent().parent().parent();
+            var res = confirm('确定删除么？');
+            if (res) {
+                var caseId = $(this).attr('name');
+                var currentDiv = $(this).parent().parent().parent();
 
-            $.ajax({
-                url: '/case/deletecases',
-                method: 'post',
-                dataType: 'json',
-                contentType: 'application/json',
-                data: JSON.stringify({'caseId':[caseId]}),
-                success: function (resp) {
-                    if (resp.msg == "删除成功") {
-                        currentDiv.remove();
+                $.ajax({
+                    url: '/case/deletecases',
+                    method: 'post',
+                    dataType: 'json',
+                    contentType: 'application/json',
+                    data: JSON.stringify({'caseId': [caseId]}),
+                    success: function (resp) {
+                        if (resp.msg == "删除成功") {
+                            currentDiv.remove();
+                        }
+                        alert(resp.msg);
                     }
-                    alert(resp.msg);
-                }
-            });
+                });
+
+            } else {
+                return;
+            }
+
 
 
         });
@@ -133,7 +159,7 @@
         // 注册热键,测试
         $(document).on('click', '.do-test', function () {
             var caseId = $(this).attr('name');
-            var parentTag = $(this).parent().parent().parent().parent();
+            var parentTag = $(this).parent().parent().parent().children('td').eq(3);
 
             $.ajax({
                 url: '/case/dotest',
@@ -146,8 +172,10 @@
                         parentTag.append('<div class="showTest"><span style="color: green">测试通过</span></div>');
                     } else {
                         parentTag.append('<div class="showTest"><span style="color: red">'+JSON.stringify(resp)+'</span></div>');
+                        parentTag.attr('title', resp.error);
 
                     }
+
                     {#alert(JSON.stringify(resp));#}
                 }
             });
@@ -164,3 +192,59 @@
 
 
 
+
+
+
+{#        function getThirdContent(obj) {#}
+{##}
+{##}
+{##}
+{#            // 先清空三级的内容#}
+{#            $('#third').html('');#}
+{#            sid = $(obj).attr('s-id');#}
+{#            $.ajax({#}
+{#                url: '/case/getThirdContent_case',#}
+{#                type: 'post',#}
+{#                contentType: 'application/json',#}
+{#                dataType: 'json',#}
+{#                data: JSON.stringify({'func_id':sid}),#}
+{#                success: function (resp) {#}
+{##}
+{#                    // 请求成功后，加载三级模块#}
+{#                    for (x in resp.data) {#}
+{#                        case_id = resp.data[x].case_id#}
+{#                        case_data = JSON.stringify(resp.data[x].case_data)#}
+{#                        explain = resp.data[x].explain#}
+{#                        apiname = resp.data[x].apiname#}
+{##}
+{#                        var content = '<div class="form-horizontal param_wrap " style="float: left">'#}
+{#                        content += '<div class="panel panel-success col-md-12">'#}
+{#                        content += '<div class="panel-body">'#}
+{#                        content += '<div class="input-group " >'#}
+{#                        content += '<span class="input-group-addon ">'#}
+{#                        content += '<input type="checkbox" aria-label="..." name="choose" value=' + case_id + '>'#}
+{#                        content += '</span>'#}
+{#                        content += '<div class="list-group">'#}
+{#                        content += '<a href="/case/editcase?case_id=' + case_id + '" class="list-group-item">'#}
+{#                        content += '<h4 class="list-group-item-heading ">' + apiname + '</h4>'#}
+{#                        content += '<p style="display: none" class="allcase">' + case_id + '</p>'#}
+{#                        content += '<p class="list-group-item-text ' + case_id + ' " id="case_id">用例ID:' + case_id + '</p>'#}
+{#                        content += '<p class="list-group-item-text">用例说明：' + explain + '</p>'#}
+{#                        {#content += '<div class="row">'#}
+{#content += '</div>'#}
+{#                        content += '</a>'#}
+{#                        content += '<div class="pull-right">'#}
+{#                        content += '<button type="submit" class="btn btn-success btn-block do-test" name=' + case_id +  '>测试</button>'#}
+{#                        content += '<button type="submit" class="btn btn-success btn-block do-delete" name=' + case_id +  '>删除</button>'#}
+{#                        content += '</div>'#}
+{#                        content += '</div>'#}
+{#                        content += '</div>'#}
+{#                        content += '</div>'#}
+{##}
+{#                        $('#third').append(content);#}
+{#                    }#}
+{##}
+{#                }#}
+{##}
+{#            })#}
+{#        }#}
