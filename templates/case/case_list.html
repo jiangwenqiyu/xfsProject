@@ -90,7 +90,7 @@
                         case_num = resp.data[x].case_num
 
                         var content = '<div class="list-group" model_id="' + model_id + '">'
-                        content += '<a href="/case/addcase?id=' + model_id + '" class="list-group-item">'
+                        content += '<a href="/case/addcase?id=' + model_id + '" class="list-group-item" target="_blank">'
                         content += '<h4 class="list-group-item-heading">' + model_name + '</h4>'
                         content += '<p class="list-group-item-text">' + model_explain + '</p>'
                         content += '<p class="list-group-item-text" id="case_num">下属用例数:<span>'+case_num+'</span></p>'
