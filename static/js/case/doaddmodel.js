@@ -1,4 +1,3 @@
-;
 var member_reg_ops = {
     init: function () {
         this.eventBind();
@@ -92,3 +91,23 @@ var member_reg_ops = {
 $(document).ready(function () {
     member_reg_ops.init();
 })
+
+
+
+
+$("#upexcel").click(function () {
+    var formData = new FormData($('#uploadForm')[0]);
+    $.ajax({
+        type: 'post',
+        url: "/case/batchExportModel", //上传文件的请求路径必须是绝对路劲
+        data: formData,
+        cache: false,
+        processData: false,
+        contentType: false,
+    }).success(function (resp) {
+        alert(resp.msg);
+        filename=data;
+    }).error(function () {
+        alert("上传失败");
+    });
+});
