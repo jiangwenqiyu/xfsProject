@@ -3,7 +3,7 @@ import json
 import os
 from app import app, db, redis_store
 from . import case_page
-from flask import request, redirect, g, jsonify, make_response, url_for
+from flask import request, redirect, g, jsonify, make_response, url_for, send_file, Response
 from common.libs import helper, UrlManager
 from common.models.coordination import Coordination
 from common.models.coordinationcase import CoordinationCase
@@ -25,6 +25,7 @@ import datetime
 import time
 from config import constance
 import re
+import xlrd
 
 
 header = header = {'contenType':'application/json',
@@ -601,7 +602,7 @@ def deleteModel():
     where s1.id='{}' 
     '''.format(model_id)
     data = list(db.session.execute(sql))
-    if data == ():
+    if data == []:
         db.session.query(Coordination).filter(Coordination.id==model_id).delete()
         try:
             db.session.commit()
@@ -1168,6 +1169,69 @@ def saveEditScene():
 
 
 
+# 批量导入模板
+@case_page.route('/batchExportModel', methods=['POST'])
+def batchExportModel():
+    file = request.files.get('file')
+    f = file.read()
+    work = xlrd.open_workbook(file_contents=f)
+    sheet = work.sheet_by_index(0)
+
+    rows = sheet.nrows
+    cols = sheet.ncols
+
+    for i in range(1, rows):
+        apiname = sheet.cell_value(i, 0)
+        explain = sheet.cell_value(i, 1)
+        route = sheet.cell_value(i, 2)
+        reqType = sheet.cell_value(i, 3)
+        param = sheet.cell_value(i, 4)
+        data = sheet.cell_value(i, 5)
+        dataType = sheet.cell_value(i, 6)
+        funcid = int(sheet.cell_value(i, 7))
+
+        # 校验数据
+        if apiname == '' or explain == '' or route == '' or reqType == '' or param == '' or data == '' or dataType =='' or funcid == '':
+            return jsonify(status=RetJson.failCode, msg = '有必填项为空')
+
+        try:
+            param = json.loads(param)
+            data = json.loads(data)
+        except:
+            return jsonify(status=RetJson.failCode, msg = 'param或data, json格式不正确')
+
+        if reqType.upper() != 'POST' and reqType.upper() != 'GET':
+            return jsonify(status=RetJson.failCode, msg = '请求方式不正确')
+
+        if dataType.upper() != 'JSON' and reqType.upper() != 'DATA':
+            return jsonify(status=RetJson.failCode, msg = '参数类型不正确')
+
+        sql = '''
+        insert into coordination(apiname, `explain`, route, method, param, data, dataType, func_id) values ('{}','{}','{}','{}','{}','{}','{}', '{}')
+        '''.format(apiname, explain, route, reqType, param, data, dataType, funcid)
+        try:
+            db.session.execute(sql)
+        except Exception as e:
+            db.session.rollback()
+            return jsonify(status=RetJson.failCode, msg = '数据库提交失败')
+
+    try:
+        db.session.commit()
+    except Exception as e:
+        print(e, '******************')
+        db.session.rollback()
+        return jsonify(status=RetJson.failCode, msg = '数据库提交失败')
+    else:
+        return jsonify(status=RetJson.successCode, msg = '导入成功')
+
+# 导出模板
+@case_page.route('/exportModel', methods=['GET'])
+def exportModel():
+    with open('./common/导入用例模板.xlsx', 'rb') as f:
+        file = f.read()
+
+        # resp.headers.add("Content-Type", "application/vnd.ms-excel")
+        return Response(file, mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
 
 
 
