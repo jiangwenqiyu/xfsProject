@@ -450,7 +450,8 @@ def do_addmodel():
     try:
         db.session.commit()
         db.session.close()
-    except:
+    except Exception as e:
+        print('数据库提交失败',e)
         db.session.rollback()
         db.session.close()
         return helper.ops_renderJSON(msg="数据库提交失败")
