@@ -418,6 +418,7 @@ def do_addmodel():
     data = req['data'] if 'data' in req else ""
     dataType = req['dataType'] if 'dataType' in req else ""
     func_id = req['func_id'] if 'func_id' in req else ""
+    header = req['header'] if 'header' in req else ""
 
     if apiname is None or len(apiname) < 1:
         return helper.ops_renderErrJSON(msg="接口名称是必填项")
@@ -435,6 +436,8 @@ def do_addmodel():
         return helper.ops_renderErrJSON(msg="入参类型是必填项,没有入参的话，随便填一个")
     if func_id is None or len(func_id) < 1:
         return helper.ops_renderErrJSON(msg="功能模块id是必填项")
+    if header is None or len(func_id) < 1:
+        return helper.ops_renderErrJSON(msg="请求头是必填项")
 
     modle_addmodel= Coordination()
     modle_addmodel.apiname = apiname
@@ -445,6 +448,7 @@ def do_addmodel():
     modle_addmodel.data = data
     modle_addmodel.dataType = dataType
     modle_addmodel.func_id = func_id
+    modle_addmodel.header = header
 
     db.session.add(modle_addmodel)
     try:
@@ -500,7 +504,9 @@ def exeCases():
                                 CoordinationCase.case_data,
                                 CoordinationCase.expected_results,
                                 Coordination.method,
-                                Coordination.dataType
+                                Coordination.dataType,
+                                Coordination.header
+
                                 ).join(Coordination, Coordination.id==CoordinationCase.coordination_id).filter(CoordinationCase.case_id.in_(caseids)).all()
         caseDict = dict()
         for i in info:
@@ -514,6 +520,7 @@ def exeCases():
             temp['method'] = i.method
             temp['dataType'] = i.dataType
             temp['explain'] = i.explain
+            temp['header'] = i.header
 
             caseDict[i.case_id] = temp
         # 把用例进行排序
