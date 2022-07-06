@@ -1204,18 +1204,20 @@ def batchExportModel():
         reqType = sheet.cell_value(i, 3)
         param = sheet.cell_value(i, 4)
         data = sheet.cell_value(i, 5)
-        dataType = sheet.cell_value(i, 6)
-        funcid = int(sheet.cell_value(i, 7))
+        header = sheet.cell_value(i, 6)
+        dataType = sheet.cell_value(i, 7)
+        funcid = int(sheet.cell_value(i, 8))
 
         # 校验数据
-        if apiname == '' or explain == '' or route == '' or reqType == '' or param == '' or data == '' or dataType =='' or funcid == '':
+        if apiname == '' or explain == '' or route == '' or reqType == '' or param == '' or data == '' or dataType =='' or funcid == '' or header == '':
             return jsonify(status=RetJson.failCode, msg = '有必填项为空')
 
         try:
             param = json.loads(param)
             data = json.loads(data)
+            header = json.loads(header)
         except:
-            return jsonify(status=RetJson.failCode, msg = 'param或data, json格式不正确')
+            return jsonify(status=RetJson.failCode, msg = 'param或data或header, json格式不正确')
 
         if reqType.upper() != 'POST' and reqType.upper() != 'GET':
             return jsonify(status=RetJson.failCode, msg = '请求方式不正确')
@@ -1224,8 +1226,8 @@ def batchExportModel():
             return jsonify(status=RetJson.failCode, msg = '参数类型不正确')
 
         sql = '''
-        insert into coordination(apiname, `explain`, route, method, param, data, dataType, func_id) values ('{}','{}','{}','{}','{}','{}','{}', '{}')
-        '''.format(apiname, explain, route, reqType, param, data, dataType, funcid)
+        insert into coordination(apiname, `explain`, route, method, param, data, dataType, func_id, header) values ('{}','{}','{}','{}','{}','{}','{}', '{}', '{}')
+        '''.format(apiname, explain, route, reqType, param, data, dataType, funcid, header)
         try:
             db.session.execute(sql)
         except Exception as e:
