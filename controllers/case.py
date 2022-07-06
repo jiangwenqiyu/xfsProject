@@ -447,8 +447,13 @@ def do_addmodel():
     modle_addmodel.func_id = func_id
 
     db.session.add(modle_addmodel)
-    db.session.commit()
-    db.session.close()
+    try:
+        db.session.commit()
+        db.session.close()
+    except:
+        db.session.rollback()
+        db.session.close()
+        return helper.ops_renderJSON(msg="数据库提交失败")
 
     return helper.ops_renderJSON(msg="提交成功")
 
