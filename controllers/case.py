@@ -450,7 +450,8 @@ def do_addmodel():
     try:
         db.session.commit()
         db.session.close()
-    except:
+    except Exception as e:
+        print('数据库提交失败',e)
         db.session.rollback()
         db.session.close()
         return helper.ops_renderJSON(msg="数据库提交失败")
@@ -1262,7 +1263,20 @@ def queryInfo():
      where s2.skuNo = '{}'
      '''.format(skuno)
     cur.execute(sql)
-    d = cur.fetchone()
+    d = list(cur.fetchone())
+
+
+    sql = '''
+    select group_concat(a.saleAreaNo) area from product_sku sku
+    left join product_supply_salearea_product a on a.productUuid = sku.productUuid
+    where sku.skuNo = '021238'
+    group by a.productUuid 
+    '''
+    cur.execute(sql)
+    area = list(cur.fetchone())[0]
+    d.append(area)
+
+
 
     data = dict()
     data['basicInfo'] = d
