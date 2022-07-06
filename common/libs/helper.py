@@ -2,7 +2,7 @@ from flask import jsonify,g,render_template
 import math
 
 
-def ops_renderJSON(code = 200,msg = "妥了",data={}):
+def ops_renderJSON(code = 200,msg = "注册成功",data={}):
     resp = {"code":code,"msg":msg,"data":data}
     return jsonify(resp)
 def ops_renderErrJSON(msg = "出问题了，找旭姐看看咋回事",data ={}):
