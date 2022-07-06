@@ -1,10 +1,7 @@
-# # coding: utf-8
-# from app import app
-# from flask_sqlalchemy import SQLAlchemy
-# app.config['SQLALCHEMY_DATABASE_URI'] = "mysql://root:xfs123456@192.168.0.129:3306/xfstestpj"
-# db = SQLAlchemy(app)
-
+# coding: utf-8
 from app import db
+
+
 class Coordination(db.Model):
     __tablename__ = 'coordination'
 
