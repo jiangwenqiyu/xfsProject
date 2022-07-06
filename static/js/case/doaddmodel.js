@@ -20,6 +20,7 @@ var member_reg_ops = {
             var data = $(".addmodel_wrap input[name = data]").val();
             var dataType = $(".addmodel_wrap input[name = dataType]").val();
             var func_id = $("#funcInfo option:selected").attr('value');
+            var header = $(".addmodel_wrap input[name = header]").val();
 
 
             if (func_id == null || func_id == "None") {
@@ -68,7 +69,8 @@ var member_reg_ops = {
                     param: param,
                     data: data,
                     dataType: dataType,
-                    func_id: func_id
+                    func_id: func_id,
+                    header: header
 
                 },
                 success: function (res) {
