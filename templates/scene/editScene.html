@@ -1,4 +1,10 @@
 {% extends "/common/layout.html" %}
+
+{% block title %}
+    <title>鑫方盛测试品台-场景编辑</title>
+{% endblock %}
+
+
 {% block content %}
 
 <div sceneid="{{ data.id }}" id="sceneid"><span>场景名称：</span><input type="text" value="{{ data.name }}" id="sceneName">

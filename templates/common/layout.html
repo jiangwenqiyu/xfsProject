@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>鑫方盛测试平台</title>
+    {% block title %}
+    {% endblock %}
 
     <link rel="stylesheet" href="{{ buildStaticUrl('/plugins/bootstrap_v3/css/bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ buildStaticUrl('/css/pageColor.css') }}">
@@ -34,7 +35,7 @@
                     <li><a href="{{ buildUrl('/case/mylist') }}">用例列表</a></li>
                     <li><a href="{{ buildUrl('/case/viewScene') }}">场景管理</a></li>
 
-                    {% if current_user.user_id == 'admin' or current_user.user_id == 'jiangjiang' %}
+                    {% if current_user.user_id == 'admin' or current_user.user_id == 'jyc' %}
                         <li><a href="{{ buildUrl('/stress/stress') }}">压力测试</a></li>
                     {% endif %}
 
