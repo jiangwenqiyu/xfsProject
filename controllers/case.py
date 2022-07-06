@@ -1002,13 +1002,17 @@ def editScene():
     if caseids[0] == '':
         caseinfo = []
     else:
+        if len(caseids) == 1:
+            caseids1 = str(tuple(caseids)).replace(',', '')
+        else:
+            caseids1 = tuple(caseids)
         sql = '''
         select ca.case_id, ca.explain, sys.name, func.name from coordination_case ca
         left join coordination m on m.id = ca.coordination_id
         left join func_info func on func.id = m.func_id
         left join system_info sys on sys.id = func.system_id
         where ca.case_id in {}
-        '''.format(tuple(caseids))
+        '''.format(caseids1)
 
         caseinfo = db.session.execute(sql)
 
