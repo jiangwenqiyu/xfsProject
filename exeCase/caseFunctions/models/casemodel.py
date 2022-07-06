@@ -18,7 +18,7 @@ class Test:
     # @allure.story('')
     @pytest.mark.parametrize('caseInfo', PyConfig.caseInfos)
     def test_run(self, caseInfo):
-        header = caseInfo['header']
+        header = json.loads(caseInfo['header'])
         url = caseInfo['route']
         data = caseInfo['case_data']
         param = caseInfo['param']
