@@ -58,6 +58,17 @@ class RunPyTest:
 
 
     def run(self, userid, caseInfos, path, reportbackContent, repId):
+
+        sql = '''
+        select * from reportInfo
+        
+        '''
+        data = list(db.session.execute(sql))
+        print(data)
+
+
+
+
         self.userid = userid
         self.path = path
         self.caseInfos = caseInfos
