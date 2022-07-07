@@ -15,48 +15,70 @@
 
     </div>
 
+
     <div class="row">
 
         <form method="post" action="/case/addScene" target="_self" class="col-md-12" style="margin-top: 20px">
-            <input type="text" value="" name="sceneName" class="sceneName">
-            <button id="addScene" type="submit" class="btn btn-primary">添加场景</button>
+{#            <input type="text" value="" name="sceneName" class="sceneName" style="margin-left: 50px">#}
+{#            <button id="addScene" type="submit" class="btn btn-primary">添加场景</button>#}
+
+            <div class="col-lg-3">
+                <div class="input-group"  style="margin-left: 50px">
+                    <input type="text" class="form-control sceneName" value="" name="sceneName">
+                    <span class="input-group-btn">
+						<button id="addScene" type="submit" class="btn btn-primary" style="background-color: #337AB7;color: #FFFFFF">
+							添加场景
+						</button>
+					</span>
+                </div><!-- /input-group -->
+            </div><!-- /.col-lg-6 -->
+
         </form>
+
+
 
     </div>
 
 
 
-    <table style="margin-top: 20px" class="table table-hover">
-        <thead>
-            <tr>
-                <th style="padding-right: 140px;">场景名称</th>
-                <th style="padding-right: 140px;">用例数量</th>
-                <th style="padding-right: 140px;">创建人</th>
-                <th style="padding-right: 140px;">创建时间</th>
-                <th style="padding-right: 140px;">修改时间</th>
-                <th style="padding-right: 140px;">操作</th>
-            </tr>
-        </thead>
+    <div class="row">
+        <div class="col-md-10">
+            <table style="margin-top: 20px;margin-left: 50px" class="table table-hover">
+                <thead>
+                    <tr>
+                        <th style="padding-right: 300px;">场景名称</th>
+                        <th style="padding-right: 10px;">用例数量</th>
+                        <th style="padding-right: 20px;">创建人</th>
+                        <th style="padding-right: 140px;">创建时间</th>
+                        <th style="padding-right: 140px;">修改时间</th>
+                        <th style="padding-right: 140px;">操作</th>
+                    </tr>
+                </thead>
 
-        <tbody>
-            {% for i in data %}
-                <tr sceneid="{{ i.id }}">
-                    <td>{{ i.name }}</td>
-                    <td>{{ i.caseids }}</td>
-                    <td>{{ i.userid }}</td>
-                    <td>{{ i.createTime }}</td>
-                    <td>{{ i.updateTime }}</td>
-                    <td>
-                        <a href="/case/editScene?scenceid={{ i.id }}" target="_blank" style="padding-right: 20px">编辑</a>
-                        <a href="#" style="padding-right: 20px" class="exeCases">执行</a>
-                        <a href="#" class="deleteScene">删除</a>
-                    </td>
-                </tr>
+                <tbody>
+                    {% for i in data %}
+                        <tr sceneid="{{ i.id }}">
+                            <td>{{ i.name }}</td>
+                            <td>{{ i.caseids }}</td>
+                            <td>{{ i.userid }}</td>
+                            <td>{{ i.createTime }}</td>
+                            <td>{{ i.updateTime }}</td>
+                            <td>
+                                <a href="/case/editScene?scenceid={{ i.id }}" target="_blank" style="padding-right: 20px">编辑</a>
+                                <a href="#" style="padding-right: 20px" class="exeCases">执行</a>
+                                <a href="#" class="deleteScene">删除</a>
+                            </td>
+                        </tr>
 
-            {% endfor %}
+                    {% endfor %}
 
-        </tbody>
-    </table>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+
+
 
 
     <script>
