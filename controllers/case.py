@@ -1245,12 +1245,17 @@ def batchExportModel():
         co.header = header
         try:
             db.session.add(co)
-            db.session.commit()
+
         except:
             db.session.rollback()
-            return jsonify(status=RetJson.failCode, msg = '数据库提交失败')
-        else:
-            return jsonify(status=RetJson.successCode, msg = '导入成功')
+            return jsonify(status=RetJson.failCode, msg = '数据库添加失败')
+    try:
+        db.session.commit()
+    except:
+        db.session.rollback()
+        return jsonify(status=RetJson.failCode, msg = '数据库提交失败')
+    else:
+        return jsonify(status=RetJson.successCode, msg = '导入成功')
 
 
 # 导出模板
