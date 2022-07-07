@@ -59,8 +59,15 @@ $(document).ready(function () {
     format();
     $(function () {
         $("#assert").blur(function () {
-            data = $("#assert").html()
+            data = $("#assert").text()
+            data = JSON.stringify(data);
             $("#assert").JSONView(JSON.parse(data));
+        });
+
+        $("#data").blur(function () {
+            data = $("#data").text()
+            data = JSON.stringify(data);
+            $("#data").JSONView(JSON.parse(data));
         });
     });
 })
