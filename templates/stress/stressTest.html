@@ -6,45 +6,69 @@
 
 
 {% block content %}
-    <div>
-        <button onclick="addRow();" class="btn"><span class="glyphicon glyphicon-plus"></span></button>
-        <button id="btn-gen" onclick="generateScript();">生成脚本</button>
-        <a id="switch" href="http://192.168.0.129:8089" hidden="hidden" target="_blank">压测界面</a>
+
+    <div class="row">
+
+        <div class="col-md-12">
+            <ul class="nav nav-pills nav-stacked">
+                <li id="fis" class="active"><a href="javascript:void(0)">压力测试</a></li>
+            </ul>
+        </div>
+
     </div>
-    <div><div><strong>使用说明：</strong></div>
-        <div><span style="color: red">1.所有参数都是必填</span></div>
-        <div><span style="color: red">2.断言:{"数据类型_jmespath表达式:预期结果"},例:{"string_retData.data.name":"测试","int_retData.data.name":1}</span></div></div>
 
-    <table class="table table-bordered">
-        <thead style="background-color: white">
-        <th>编号</th>
-        <th>请求地址</th>
-        <th>请求方式:post/get</th>
-        <th>入参类型:data/json</th>
-        <th>请求头:没有填{}</th>
-        <th>入参:没有填{}</th>
-        <th><div>断言:没有填{}</div>需要前置指定数据类型</th>
-        <th>权重:数字</th>
-        </thead>
 
-        <tbody id="urls" style="background-color: white">
-        <tr>
-            <td>1</td>
-            <td class="stress" contenteditable="true" width="200"></td>
-            <td class="stress" contenteditable="true"></td>
-            <td class="stress" contenteditable="true"></td>
-            <td class="stress" contenteditable="true"></td>
-            <td class="stress" contenteditable="true"></td>
-            <td class="stress" contenteditable="true"></td>
-            <td class="stress" contenteditable="true"></td>
-        </tr>
-        </tbody>
+    <div class="row" style="margin-top: 10px">
+        <div class="col-md-12">
+            <button onclick="addRow();" class="btn"><span class="glyphicon glyphicon-plus"></span></button>
+            <button id="btn-gen" onclick="generateScript();">生成脚本</button>
+            <a id="switch" href="http://192.168.0.129:8089" hidden="hidden" target="_blank">压测界面</a>
+        </div>
+    </div>
 
-    </table>
+
+    <div class="row" style="margin-top: 10px">
+        <div class="col-md-12">
+            <div><div><strong>使用说明：</strong></div>
+            <div><span style="color: red">1.所有参数都是必填</span></div>
+            <div><span style="color: red">2.断言:{"数据类型_jmespath表达式:预期结果"},例:{"string_retData.data.name":"测试","int_retData.data.name":1}</span></div></div>
+        </div>
+    </div>
+
+    <div class="row" style="margin-top: 10px">
+        <div class="col-md-12">
+            <table class="table table-bordered" style="table-layout: fixed;">
+                <thead style="background-color: white">
+                <th>编号</th>
+                <th>请求地址</th>
+                <th>请求方式:post/get</th>
+                <th>入参类型:data/json</th>
+                <th>请求头:没有填{}</th>
+                <th>入参:没有填{}</th>
+                <th><div>断言:没有填{}</div>需要前置指定数据类型</th>
+                <th>权重:数字</th>
+                </thead>
+
+                <tbody id="urls" style="background-color: white;height: 80px;">
+                <tr>
+                    <td>1</td>
+                    <td class="stress"><input type="text" style="height: 100%;width: 100%"></td>
+                    <td class="stress"><input type="text" style="height: 100%;width: 100%"></td>
+                    <td class="stress"><input type="text" style="height: 100%;width: 100%"></td>
+                    <td class="stress"><input type="text" style="height: 100%;width: 100%"></td>
+                    <td class="stress"><input type="text" style="height: 100%;width: 100%"></td>
+                    <td class="stress"><input type="text" style="height: 100%;width: 100%"></td>
+                    <td class="stress"><input type="text" style="height: 100%;width: 100%"></td>
+                </tr>
+                </tbody>
+
+            </table>
+        </div>
+    </div>
+
 {% endblock %}
 
 {% block js %}
-    <script src="https://cdn.staticfile.org/jquery/1.10.2/jquery.min.js"></script>
     <script src="{{ buildStaticUrl('/js/stress/stressTest.js') }}"></script>
 {% endblock %}
 

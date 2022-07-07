@@ -5,13 +5,25 @@
 {% endblock %}
 
 {% block content %}
-    {# 添加场景的js   #}
+    <div class="row">
 
+        <div class="col-md-12">
+            <ul class="nav nav-pills nav-stacked">
+                <li id="fis" class="active"><a href="javascript:void(0)">场景管理</a></li>
+            </ul>
+        </div>
 
-    <form method="post" action="/case/addScene" target="_self">
-        <input type="text" value="" name="sceneName" class="sceneName">
-        <button id="addScene" type="submit" class="btn btn-primary">添加场景</button>
-    </form>
+    </div>
+
+    <div class="row">
+
+        <form method="post" action="/case/addScene" target="_self" class="col-md-12" style="margin-top: 20px">
+            <input type="text" value="" name="sceneName" class="sceneName">
+            <button id="addScene" type="submit" class="btn btn-primary">添加场景</button>
+        </form>
+
+    </div>
+
 
 
     <table style="margin-top: 20px" class="table table-hover">

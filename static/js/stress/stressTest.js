@@ -9,26 +9,26 @@ function generateScript() {
     var data = [];
 
     $('#urls').children().each(function (i) {
-        if ($.trim($(this).children('td:eq(1)').text()) == '') {
+        if ($.trim($(this).children('td:eq(1)').children('input:eq(0)').val()) == '') {
             return 0;
         }else {
-
             var temp = [];
 
             $(this).children().each(function (x) {
+                console.log(this)
                 if (x != 0) {
-                    if ($.trim($(this).text()) == '') {
+                    if ($.trim($(this).children('input:eq(0)').val()) == '') {
                         alert('有内容没填');
                         throw '必填项不能为空';
                     } else {
                         if (x == 6 || x == 4 || x == 5) {
                             temp.push(
                                 JSON.parse(
-                                    $(this).text()
+                                    $(this).children('input:eq(0)').val()
                                 )
                             );
                         } else {
-                            temp.push($(this).text());
+                            temp.push($(this).children('input:eq(0)').val());
                         }
 
                     }

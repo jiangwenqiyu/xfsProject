@@ -30,8 +30,8 @@
 
             <ul class="nav navbar-nav navbar-right">
                 {% if current_user %}
-                    <li><a href="{{ buildUrl('/case/addmodel') }}">添加用例模版</a></li>
-                    <li><a href="{{ buildUrl('/case/case_list') }}">添加测试用例</a></li>
+                    <li><a href="{{ buildUrl('/case/addmodel') }}">添加接口</a></li>
+                    <li><a href="{{ buildUrl('/case/case_list') }}">接口列表</a></li>
                     <li><a href="{{ buildUrl('/case/mylist') }}">用例列表</a></li>
                     <li><a href="{{ buildUrl('/case/viewScene') }}">场景管理</a></li>
 
@@ -69,7 +69,9 @@
 {#</script>#}
 
 
-<div class="container">
+<div class="container-fluid">
+
+
     {% block content %} {% endblock %}
 </div>
 {% block js %}{% endblock %}

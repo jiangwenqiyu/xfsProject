@@ -6,30 +6,46 @@
 
 {% block content %}
 
-    <table>
-    <thead>
-    <tr>
-        <td style="padding-right: 450px;text-align: center;vertical-align: middle">标题</td>
-        <td style="padding-right: 100px;text-align: center;vertical-align: middle">执行状态</td>
-        <td style="padding-right: 0px;text-align: center;vertical-align: middle">操作</td></tr>
-    </thead>
+    <div class="row">
 
-    <tbody>
-    {% for i in reports %}
-        <tr style="height: 25px">
-            <td><a target="_blank" href="/static/reports/{{ user_id }}_{{ i.backContent }}/report/index.html">{{ i.reportName }}</a></td>
-            {% if i.exeState == 0 %}
-                <td style="color: orangered">执行中</td>
-            {% else %}
-                <td style="color: lightseagreen">完成</td>
-            {% endif %}
-            <td><a href="#" style="margin-left: 50px;" repid={{ i.id }} onclick=deleteReport(this)>删除</a><a href="#" style="margin-left: 50px;" repid={{ i.id }} onclick=deleteReportReal(this)>彻底删除</a></td>
-{#            <div style="margin-top: 10px;"></div>#}
-        </tr>
-    {% endfor %}
+        <div class="col-md-12">
+            <ul class="nav nav-pills nav-stacked">
+                <li id="fis" class="active"><a href="javascript:void(0)">测试报告</a></li>
+            </ul>
+        </div>
 
-    </tbody>
-    </table>
+    </div>
+
+    <div class="row" style="margin-top: 10px">
+        <div class="col-md-12">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <td>标题</td>
+                        <td>执行状态</td>
+                        <td>操作</td>
+                    </tr>
+                </thead>
+
+                <tbody>
+                {% for i in reports %}
+                    <tr style="height: 25px">
+                        <td><a target="_blank" href="/static/reports/{{ user_id }}_{{ i.backContent }}/report/index.html">{{ i.reportName }}</a></td>
+                        {% if i.exeState == 0 %}
+                            <td>执行中</td>
+                        {% else %}
+                            <td>完成</td>
+                        {% endif %}
+                        <td><a href="#" repid={{ i.id }} onclick=deleteReport(this)>删除</a><a href="#" style="margin-left: 50px;" repid={{ i.id }} onclick=deleteReportReal(this)>彻底删除</a></td>
+            {#            <div style="margin-top: 10px;"></div>#}
+                    </tr>
+                {% endfor %}
+
+                </tbody>
+
+            </table>
+        </div>
+    </div>
 
 
 

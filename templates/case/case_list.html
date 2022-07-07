@@ -1,57 +1,84 @@
 {% extends "/common/layout.html" %}
 
 {% block title %}
-    <title>鑫方盛测试品台-模板列表</title>
+    <title>鑫方盛测试品台-接口列表</title>
 {% endblock %}
 
 {% block content %}
-    <div>
-        <ul class="nav nav-pills nav-stacked">
-            <li id="fis" class="active"><a href="#">用例模板管理</a></li>
-        </ul>
-    </div>
+    <div class="row">
 
-
-    <div id="first" style="float: left; margin-left: 20px;">
-
-        <ul class="nav nav-pills nav-stacked">
-
-            {% for i in data %}
-                <li>
-                    <a href="#" f-id="{{ i.id }}" onclick="getSecondContent(this)" class="a-tag-color">   {{ i.name }}   </a>
-                </li>
-            {% endfor %}
-        </ul>
-    </div>
-
-    <div id="second" style="float: left;margin-left: 20px;">
-        <ul class="nav nav-pills nav-stacked">
-        </ul>
-    </div>
-
-
-    <div id="third" style="float: left; margin-left: 20px">
-    <div>
+        <div class="col-md-12">
+            <ul class="nav nav-pills nav-stacked">
+                <li id="fis" class="active"><a href="javascript:void(0)">接口管理</a></li>
+            </ul>
+        </div>
 
     </div>
 
+    <div class="row">
+
+        {#        一级#}
+        <div id="first" style="float: left; margin-left: 20px;" class="col-md-1">
+
+            <ul class="nav nav-pills nav-stacked">
+
+                {% for i in data %}
+                    <li>
+                        <a href="javascript:void(0)" f-id="{{ i.id }}" onclick="getSecondContent(this)" class="a-tag-color">   {{ i.name }}   </a>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+
+
+        {#二级#}
+        <div id="second" style="float: left;margin-left: 20px;" class="col-md-1">
+            <ul class="nav nav-pills nav-stacked">
+            </ul>
+        </div>
+
+
+        {#    三级#}
+        <div id="third" style="float: left; margin-left: 20px" class="col-md-9">
+        </div>
+
+
+
+        <table id='third-table-temp' style="display: none;table-layout: fixed;" class="table table-hover table-bordered">
+            <thead>
+                <tr>
+                    <th class='center' width='35%'>接口名称</th>
+                    <th class='center' width='35%'>接口说明</th>
+                    <th class='center' width='15%'>用例数</th>
+                    <th class='center' width='15%'>操作</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+            </tbody>
+
+        </table>
+
+
+
     </div>
-
-
-
-
-
 
 
 
     <script>
 
+        var firstname = '';
+        var secondname = '';
 
 
 
 
-    // ****************************************************
         function getSecondContent(obj) {
+            firstname = $(obj).text();
+
+            $('#fis').children('a').children('span').eq(0).remove();
+
             // 先清空二级的ul
             $('#second').children('ul').html('');
             // 清空三级
@@ -64,10 +91,18 @@
                 dataType: 'json',
                 data: JSON.stringify({'system_id':fid}),
                 success: function (resp) {
-                    // 请求成功后，加载二级模块
-                    for (x in resp.data) {
-                        $('#second').children('ul').append('<li><a class="a-tag-color" href="#" onclick="getThirdContent(this)" s-id=' + resp.data[x].id + '>' + resp.data[x].name + '</a></li>')
+
+                    if (resp.status == 0) {
+                        // 请求成功后，加载二级模块
+                        for (x in resp.data) {
+                            $('#second').children('ul').append('<li><a class="a-tag-color" href="javascript:void(0)" onclick="getThirdContent(this)" s-id=' + resp.data[x].id + '>' + resp.data[x].name + '</a></li>');
+                        }
+
+                        // 加载完二级页面，直接点击第一个
+                        second = $('#second').children('ul').children('li').eq(0).children('a').eq(0);
+                        getThirdContent(second)
                     }
+
 
                 }
 
@@ -75,9 +110,20 @@
         }
 
         function getThirdContent(obj) {
+            secondname = $(obj).text();
 
             // 先清空三级的内容
             $('#third').html('');
+
+            // 创建table
+            var table = $('#third-table-temp').clone();
+            $('#third-table').remove();
+
+            table.attr('id', 'third-table');
+            $('#third').append(table);
+            $('#third-table').attr('style', 'visibility:visable');
+
+
             sid = $(obj).attr('s-id');
             $.ajax({
                 url: '/case/getThirdContent_model',
@@ -93,18 +139,16 @@
                         model_name = resp.data[x].model_name
                         model_explain = resp.data[x].model_explain
                         case_num = resp.data[x].case_num
+                        content = '<tr model_id='+model_id+'><td>'+model_name+'</td><td>'+model_explain+'</td><td>'+case_num+'</td><td><a target="_blank" href="/case/addcase?id='+model_id+'">添加用例</a><br><a href="javascript:void(0)" class="do-delete">删除</a></td></tr>'
+                        $("#third-table").children('tbody').append(content);
 
-                        var content = '<div class="list-group" model_id="' + model_id + '">'
-                        content += '<a href="/case/addcase?id=' + model_id + '" class="list-group-item" target="_blank">'
-                        content += '<h4 class="list-group-item-heading">' + model_name + '</h4>'
-                        content += '<p class="list-group-item-text">' + model_explain + '</p>'
-                        content += '<p class="list-group-item-text" id="case_num">下属用例数:<span>'+case_num+'</span></p>'
-                        content += '</a>'
-                        content += '<a href="#" class="do-delete">删除模板</a>'
-
-                        content += '</div>'
-                        $('#third').append(content);
                     }
+
+                    // 更改导航栏
+                    var orign = $("#fis").children('a').eq(0).text();
+                    orign += '&nbsp'+'&nbsp'+'&nbsp'+'&nbsp'+'&nbsp' +  '<span style="color: whitesmoke">'+firstname + '/' + ' '+secondname + '</span>';
+                    $("#fis").children('a').eq(0).html(orign);
+
 
                 }
 
@@ -114,10 +158,10 @@
 
         // 注册热键,删除功能
         $(document).on('click', '.do-delete', function () {
-            var case_num = $(this).parent().children('a').children('p').children('span').text()
+            var case_num = $(this).parent().parent().children('td').eq(2).text();
             if (case_num == '0') {
-                var model_id = $(this).parent().attr('model_id')
-                var currentDiv = $(this).parent();
+                var model_id = $(this).parent().parent().attr('model_id');
+                var currentDiv = $(this).parent().parent();
 
                 $.ajax({
                     url: '/case/deletemodel',
@@ -141,9 +185,22 @@
             }
 
 
-
-
         });
+
+
+        {#页面加载起始，自动进入第一个模块的第一个功能下#}
+        $(document).ready(function () {
+
+
+            var fid = $('#first').children('ul').children('li').eq(0).children('a').eq(0);
+            getSecondContent(fid);
+
+
+
+
+
+
+        })
 
 
 
