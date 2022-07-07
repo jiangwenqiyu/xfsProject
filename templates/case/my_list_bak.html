@@ -11,36 +11,69 @@
         </ul>
     </div>
 
-
-    <div id="first" style="float: left">
-    <ul class="nav nav-pills nav-stacked">
-        {% for i in data %}
-        <li>
-            <a href="#" f-id="{{ i.id }}" onclick="getSecondContent(this)" class="a-tag-color">   {{ i.name }}   </a>
-        </li>
-        {% endfor %}
-    </ul>
-    </div>
-
-    <div id="second" style="float: left;margin-left: 20px">
-    <ul class="nav nav-pills nav-stacked">
-    </ul>
-    </div>
+    <div class="row">
 
 
-    <div id="third" style="float: left; margin-left: 20px">
+        <div id="first" style="float: left" class="col-md-1">
+            <ul class="nav nav-pills nav-stacked">
+                {% for i in data %}
+                <li>
+                    <a href="javascript:void(0)" f-id="{{ i.id }}"  class="a-tag-color getsecond">   {{ i.name }}   </a>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+
+
+        <div id="second" style="float: left;margin-left: 20px" class="col-md-1">
+            <ul class="nav nav-pills nav-stacked">
+            </ul>
+        </div>
+
+
+        <div id="third" style="float: left; margin-left: 20px" class="col-md-9">
+
+        </div>
+
+
+        <table id="third-table-temp" class='table table-hover table-bordered' style='table-layout: fixed;display: none'>
+            <thead>
+                <tr>
+                    <th class='center'>用例id</th>
+                    <th class='center' width='20%'>接口名称</th>
+                    <th class='center' width='20%'>用例说明</th>
+                    <th class='center' width='20%'>结果</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+            </tbody>
+        </table>
 
     </div>
 
 
 
     <script>
+
+        var firstname = '';
+        var secondname = '';
+
+
         function getSecondContent(obj) {
+            firstname = $(obj).text();
+
+            $('#fis').children('a').children('span').eq(0).remove();
+
+
             // 先清空二级的ul
             $('#second').children('ul').html('');
             // 清空三级
             $('#third').html('');
             fid = $(obj).attr('f-id');
+
             $.ajax({
                 url: '/case/getSecondContent',
                 type: 'post',
@@ -48,44 +81,47 @@
                 dataType: 'json',
                 data: JSON.stringify({'system_id':fid}),
                 success: function (resp) {
-                    // 请求成功后，加载二级模块
-                    for (x in resp.data) {
-                        $('#second').children('ul').append('<li><a class="a-tag-color" href="#" onclick="getThirdContent(this)" s-id=' + resp.data[x].id + '>' + resp.data[x].name + '</a></li>')
+                    if (resp.status == 0) {
+                        // 请求成功后，加载二级模块
+                        for (x in resp.data) {
+                            $('#second').children('ul').append('<li><a class="a-tag-color" href="javascript:void(0)" onclick="getThirdContent(this)" s-id=' + resp.data[x].id + '>' + resp.data[x].name + '</a></li>');
+                        }
+
+                        var fid = $('#second').children('ul').children('li').eq(0).children('a').eq(0);
+                        getThirdContent(fid)
                     }
+
 
                 }
 
             })
+
         }
+
+
+        $(document).on('click', '.getsecond', function () {
+
+            getSecondContent(this)
+
+        });
 
 
         function getThirdContent(obj) {
 
 
+            secondname = $(obj).text();
+
             // 先清空三级的内容
             $('#third').html('');
 
-            // 生成table
-            var table = "" +
-                "<table class='table table-hover table-bordered' style='table-layout: fixed'>" +
-                "<thead>" +
-                "<tr>" +
-                "<th class='center'>用例id</thclass>" +
-                "<th class='center'>接口名称</thclass>" +
-                "<th class='center'>用例说明</thclass>" +
-                "<th class='center' width='20%'> 结果</thclass>" +
-                "<th>操作</th>" +
-                "</tr>" +
-                "</thead>" +
-                "" +
-                "<tbody>" +
-                "" +
-                "</tbody>" +
-                "" +
-                "</table>" +
-                ""
+            // 创建table
+            var table = $('#third-table-temp').clone();
+            $('#third-table').remove();
 
+            table.attr('id', 'third-table');
             $('#third').append(table);
+            $('#third-table').attr('style', 'visibility:visable');
+
 
             sid = $(obj).attr('s-id');
             $.ajax({
@@ -103,12 +139,12 @@
                         explain = resp.data[x].explain
                         apiname = resp.data[x].apiname
 
-                        var temp = "<tr>" +
+                        var temp = "<tr> " +
                             "<td>" + case_id + "</td>" +
 
-                            "<td>" + apiname + "</td>" +
+                            "<td class='try-gan' title='" + apiname + "' style='overflow: hidden;text-overflow:ellipsis;white-space: nowrap'>" + apiname + "</td>" +
 
-                            "<td><a href='/case/editcase?case_id=" + case_id + "' target='_blank'>"+explain+"</a></td>" +
+                            "<td class='try-gan' title='" + explain + "' style='overflow: hidden;text-overflow:ellipsis;white-space: nowrap'><a href='/case/editcase?case_id=" + case_id + "' target='_blank'>"+explain+"</a></td>" +
 
                             "<td class='try-gan' style='overflow: hidden;text-overflow:ellipsis;white-space: nowrap'></td>" +
 
@@ -119,8 +155,13 @@
 
                             "</tr>"
 
-                        $('tbody').append(temp);
+                        $("#third-table").children('tbody').append(temp);
                     }
+                    // 更改导航栏
+                    var orign = $("#fis").children('a').eq(0).text();
+                    orign += '&nbsp'+'&nbsp'+'&nbsp'+'&nbsp'+'&nbsp' +  '<span style="color: whitesmoke">'+firstname + '/' + ' '+secondname + '</span>';
+                    $("#fis").children('a').eq(0).html(orign);
+
 
                 }
 
@@ -187,6 +228,19 @@
         });
 
 
+        {#页面加载起始，自动进入第一个模块的第一个功能下#}
+        $(document).ready(function () {
+
+
+            var fid = $('#first').children('ul').children('li').eq(0).children('a').eq(0);
+            getSecondContent(fid);
+
+
+
+
+        })
+
+
 
 
     </script>
@@ -194,60 +248,3 @@
 {% endblock %}
 
 
-
-
-
-
-{#        function getThirdContent(obj) {#}
-{##}
-{##}
-{##}
-{#            // 先清空三级的内容#}
-{#            $('#third').html('');#}
-{#            sid = $(obj).attr('s-id');#}
-{#            $.ajax({#}
-{#                url: '/case/getThirdContent_case',#}
-{#                type: 'post',#}
-{#                contentType: 'application/json',#}
-{#                dataType: 'json',#}
-{#                data: JSON.stringify({'func_id':sid}),#}
-{#                success: function (resp) {#}
-{##}
-{#                    // 请求成功后，加载三级模块#}
-{#                    for (x in resp.data) {#}
-{#                        case_id = resp.data[x].case_id#}
-{#                        case_data = JSON.stringify(resp.data[x].case_data)#}
-{#                        explain = resp.data[x].explain#}
-{#                        apiname = resp.data[x].apiname#}
-{##}
-{#                        var content = '<div class="form-horizontal param_wrap " style="float: left">'#}
-{#                        content += '<div class="panel panel-success col-md-12">'#}
-{#                        content += '<div class="panel-body">'#}
-{#                        content += '<div class="input-group " >'#}
-{#                        content += '<span class="input-group-addon ">'#}
-{#                        content += '<input type="checkbox" aria-label="..." name="choose" value=' + case_id + '>'#}
-{#                        content += '</span>'#}
-{#                        content += '<div class="list-group">'#}
-{#                        content += '<a href="/case/editcase?case_id=' + case_id + '" class="list-group-item">'#}
-{#                        content += '<h4 class="list-group-item-heading ">' + apiname + '</h4>'#}
-{#                        content += '<p style="display: none" class="allcase">' + case_id + '</p>'#}
-{#                        content += '<p class="list-group-item-text ' + case_id + ' " id="case_id">用例ID:' + case_id + '</p>'#}
-{#                        content += '<p class="list-group-item-text">用例说明：' + explain + '</p>'#}
-{#                        {#content += '<div class="row">'#}
-{#content += '</div>'#}
-{#                        content += '</a>'#}
-{#                        content += '<div class="pull-right">'#}
-{#                        content += '<button type="submit" class="btn btn-success btn-block do-test" name=' + case_id +  '>测试</button>'#}
-{#                        content += '<button type="submit" class="btn btn-success btn-block do-delete" name=' + case_id +  '>删除</button>'#}
-{#                        content += '</div>'#}
-{#                        content += '</div>'#}
-{#                        content += '</div>'#}
-{#                        content += '</div>'#}
-{##}
-{#                        $('#third').append(content);#}
-{#                    }#}
-{##}
-{#                }#}
-{##}
-{#            })#}
-{#        }#}

@@ -1,20 +1,28 @@
 {% extends "/common/layout.html" %}
 {% block title %}
-    <title>鑫方盛测试品台-添加模板</title>
+    <title>鑫方盛测试品台-添加接口</title>
 {% endblock %}
 
 {% block content %}
     <div class="row">
         <div class="col-lg-8 col-lg-offset-2">
             <div class="panel panel-default">
-                <div class="panel-heading">添加用例模版
-                    <form id="uploadForm" method="post" enctype="multipart/form-data">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-2">添加接口</div>
+                        <div class="col-md-2">
+                            <form id="uploadForm" method="post" enctype="multipart/form-data">
 
-                        <input type="file" name="file" accept=".xlsx" value="请上传Excel文件"/>
-                        <input id="upexcel" type="submit" value="导入" class="btn_search">
-                        <a href="/case/exportModel">导出模板</a>
+                                <input type="file" name="file" accept=".xlsx" value="请上传Excel文件"/>
+                                <input id="upexcel" type="submit" value="导入" class="btn_search">
+                                <a href="/case/exportModel">导出模板</a>
 
-                    </form>
+                            </form>
+                        </div>
+
+                    </div>
+
+
 
                 </div>
 

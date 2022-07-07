@@ -226,8 +226,10 @@ def getSecondContent():
         temp['id'] = i.id
         temp['name'] = i.name
         data.append(temp)
+    if data==[]:
+        return jsonify(status=RetJson.failCode, data=data)
 
-    return jsonify(status='0', data=data)
+    return jsonify(status=RetJson.successCode, data=data)
 
 @case_page.route("/getThirdContent_case", methods=["POST"])
 def getThirdContentCase():
@@ -251,8 +253,6 @@ def getThirdContentCase():
                                                       CoordinationCase.user_id==is_login.user_id,
                                                       Coordination.func_id == req['func_id']
                                                       )).all()
-    if not info:
-        return redirect(UrlManager.UrlManager.buildUrl("/case_list"))
 
     data = []
 
@@ -273,7 +273,10 @@ def getThirdContentCase():
         temp['explain'] = i.explain
         data.append(temp)
 
-    return jsonify(status='0', data=data)
+    if data == []:
+        return jsonify(status=RetJson.failCode, data=data)
+
+    return jsonify(status=RetJson.successCode, data=data)
 
 
 @case_page.route("/getThirdContent_model", methods=["POST"])
