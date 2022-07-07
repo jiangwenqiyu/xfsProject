@@ -7,7 +7,7 @@
 {% block content %}
     <div>
         <ul class="nav nav-pills nav-stacked">
-            <li id="fis" class="active"><a href="#">测试用例管理</a></li>
+            <li id="fis" class="active"><a href="#">测试用例管理&nbsp&nbsp&nbsp&nbsp&nbsp</a></li>
         </ul>
     </div>
 
@@ -60,12 +60,11 @@
 
         var firstname = '';
         var secondname = '';
+        var title = '';
 
 
         function getSecondContent(obj) {
             firstname = $(obj).text();
-
-            $('#fis').children('a').children('span').eq(0).remove();
 
 
             // 先清空二级的ul
@@ -87,6 +86,7 @@
                             $('#second').children('ul').append('<li><a class="a-tag-color" href="javascript:void(0)" onclick="getThirdContent(this)" s-id=' + resp.data[x].id + '>' + resp.data[x].name + '</a></li>');
                         }
 
+                        // 加载完二级页面，直接点击第一个
                         var fid = $('#second').children('ul').children('li').eq(0).children('a').eq(0);
                         getThirdContent(fid)
                     }
@@ -109,7 +109,12 @@
         function getThirdContent(obj) {
 
 
+            // 二级模块名称
             secondname = $(obj).text();
+
+            // 更改导航栏
+            content = title + '<span style="color: whitesmoke">'+firstname + '/' + ' '+secondname + '</span>';
+            $("#fis").children('a').eq(0).html(content);
 
             // 先清空三级的内容
             $('#third').html('');
@@ -157,10 +162,6 @@
 
                         $("#third-table").children('tbody').append(temp);
                     }
-                    // 更改导航栏
-                    var orign = $("#fis").children('a').eq(0).text();
-                    orign += '&nbsp'+'&nbsp'+'&nbsp'+'&nbsp'+'&nbsp' +  '<span style="color: whitesmoke">'+firstname + '/' + ' '+secondname + '</span>';
-                    $("#fis").children('a').eq(0).html(orign);
 
 
                 }
@@ -231,7 +232,7 @@
         {#页面加载起始，自动进入第一个模块的第一个功能下#}
         $(document).ready(function () {
 
-
+            title = $("#fis").children('a').eq(0).text();
             var fid = $('#first').children('ul').children('li').eq(0).children('a').eq(0);
             getSecondContent(fid);
 
