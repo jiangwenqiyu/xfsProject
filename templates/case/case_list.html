@@ -49,8 +49,9 @@
                 <tr>
                     <th class='center' width='35%'>接口名称</th>
                     <th class='center' width='35%'>接口说明</th>
-                    <th class='center' width='15%'>用例数</th>
-                    <th class='center' width='15%'>操作</th>
+                    <th class='center' width='10%'>用例总数</th>
+                    <th class='center' width='10%'>个人用例</th>
+                    <th class='center' width='10%'>操作</th>
                 </tr>
             </thead>
 
@@ -149,7 +150,9 @@
                         model_name = resp.data[x].model_name
                         model_explain = resp.data[x].model_explain
                         case_num = resp.data[x].case_num
-                        content = '<tr model_id='+model_id+'><td>'+model_name+'</td><td>'+model_explain+'</td><td>'+case_num+'</td><td><a target="_blank" href="/case/addcase?id='+model_id+'">添加用例</a><br><a href="javascript:void(0)" class="do-delete">删除</a></td></tr>'
+                        case_num_single = resp.data[x].case_num_single
+
+                        content = '<tr model_id='+model_id+'><td>'+model_name+'</td><td>'+model_explain+'</td><td>'+case_num+'</td><td>'+case_num_single+'</td><td><a target="_blank" href="/case/addcase?id='+model_id+'">添加用例</a><br><a href="javascript:void(0)" class="do-delete">删除</a></td></tr>'
                         $("#third-table").children('tbody').append(content);
 
                     }

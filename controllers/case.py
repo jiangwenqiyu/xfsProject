@@ -288,7 +288,7 @@ def getThirdContentModel():
     req = request.get_json()
     func_id = req.get('func_id')
 
-    info = db.session.execute('''select s1.id, s1.apiname, s1.explain, count(s2.case_id) num from coordination s1
+    info = db.session.execute('''select s1.id, s1.apiname, s1.explain, count(s2.case_id) num, s1.id from coordination s1
                                     left join coordination_case s2 on s1.id = s2.coordination_id
                                     where s1.func_id = {}
                                     group by s1.id'''.format(func_id))
@@ -299,13 +299,18 @@ def getThirdContentModel():
         model_name = i[1]
         model_explain = i[2]
         case_num = i[3]
+        coordinationid = i[4]
+        single = list(db.session.execute('''select count(0) from coordination s1
+                                    left join coordination_case s2 on s1.id = s2.coordination_id
+                                    where s1.func_id = {} and s2.user_id='{}' and s2.coordination_id = {}
+                                    '''.format(func_id, is_login.user_id, coordinationid)))
         temp['model_id'] = model_id
         temp['model_name'] = model_name
         temp['model_explain'] = model_explain
         temp['case_num'] = case_num
+        temp['case_num_single'] = single[0][0]
         data.append(temp)
 
-    print(data)
 
 
     return jsonify(status='0', data=data)
