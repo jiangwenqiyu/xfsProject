@@ -111,8 +111,8 @@ def addcase():
     pjlist = info.remarks.split(",")
     # param = json.loads(info.param)
     # data = json.loads(info.data)
-    param = info.param
-    data = info.data
+    param = json.dumps(info.param, ensure_ascii=False)
+    data = json.dumps(info.data, ensure_ascii=False)
     url = info.route
 
     return ops_render('case/taddcase.html', {"param": param,'data':data, "pjlist": pjlist, 'info':info, 'url':url, 'id':id})
@@ -1228,23 +1228,25 @@ def batchExportModel():
         if dataType.upper() != 'JSON' and reqType.upper() != 'DATA':
             return jsonify(status=RetJson.failCode, msg = '参数类型不正确')
 
-        sql = '''
-        insert into coordination(apiname, `explain`, route, method, param, data, dataType, func_id, header) values ('{}','{}','{}','{}','{}','{}','{}', '{}', '{}')
-        '''.format(apiname, explain, route, reqType, param, data, dataType, funcid, header)
+        co = Coordination()
+        co.apiname = apiname
+        co.explain = explain
+        co.route = route
+        co.method = reqType
+        co.param = param
+        co.data = data
+        co.dataType = dataType
+        co.func_id = funcid
+        co.header = header
         try:
-            db.session.execute(sql)
-        except Exception as e:
+            db.session.add(co)
+            db.session.commit()
+        except:
             db.session.rollback()
             return jsonify(status=RetJson.failCode, msg = '数据库提交失败')
+        else:
+            return jsonify(status=RetJson.successCode, msg = '导入成功')
 
-    try:
-        db.session.commit()
-    except Exception as e:
-        print(e, '******************')
-        db.session.rollback()
-        return jsonify(status=RetJson.failCode, msg = '数据库提交失败')
-    else:
-        return jsonify(status=RetJson.successCode, msg = '导入成功')
 
 # 导出模板
 @case_page.route('/exportModel', methods=['GET'])
