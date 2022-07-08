@@ -46,7 +46,7 @@
                             <label for="paramname"
                                    class="col-sm-2 control-label paramname">param</label>
                             <div class="col-sm-10">
-                                <pre contenteditable="true" id="param">{{ param | safe }}</pre>
+                                <pre contenteditable="true" id="param" style="max-height: 100px">{{ param | safe }}</pre>
                             </div>
                         </div>
 
@@ -54,7 +54,7 @@
                             <label for="exp_paramname"
                                    class="col-sm-2 control-label exp_paramname">入参</label>
                             <div class="col-sm-10">
-                                <pre contenteditable="true" id="data">{{ case_data | safe }}</pre>
+                                <pre contenteditable="true" id="data" style="max-height: 250px">{{ case_data | safe }}</pre>
 
                             </div>
                         </div>
@@ -63,7 +63,7 @@
                             <label for="exp_paramname"
                                    class="col-sm-2 control-label exp_paramname">断言</label>
                             <div class="col-sm-10">
-                                <pre contenteditable="true" id="assert">{{ expected_results | safe }}</pre>
+                                <pre contenteditable="true" id="assert" style="max-height: 180px">{{ expected_results | safe }}</pre>
 
                             </div>
                         </div>
