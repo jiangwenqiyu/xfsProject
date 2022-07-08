@@ -1,11 +1,18 @@
 $('.do_add').click(function () {
-    var temp = $("#data").clone();
-    temp.find('.collapser').remove()
+    // 克隆pre对象，去掉-
+    var param = $("#param").clone();
+    param.find('.collapser').remove();
+
+    var data = $("#data").clone();
+    data.find('.collapser').remove();
+
+    var assert = $("#param").clone();
+    assert.find('.collapser').remove();
 
 
-    param = $("#param").text()
-    data = temp.text()
-    assert = $("#assert").text()
+    param = param.text()
+    data = data.text()
+    assert = assert.text()
     explain = $("#explain").val();
     caseid = $(".case_id").text();
 
@@ -31,7 +38,15 @@ $('.do_add').click(function () {
 });
 
 
+function format() {
+    param = $("#param").html()
+    data = $("#data").html()
+    assert = $("#assert").html()
+    $("#param").JSONView(JSON.parse(param));
+    $("#data").JSONView(JSON.parse(data));
+    $("#assert").JSONView(JSON.parse(assert));
 
+}
 
 
 
@@ -39,16 +54,35 @@ $('.do_add').click(function () {
 
 
 $(document).ready(function () {
-    function format() {
-        param = $("#param").html()
-        data = $("#data").html()
-        assert = $("#assert").html()
-        $("#param").JSONView(JSON.parse(param));
-        $("#data").JSONView(JSON.parse(data));
-        $("#assert").JSONView(JSON.parse(assert));
-
-    }
+    // 初始格式化
     format();
+    // 鼠标移开执行
+    $(function () {
+
+        $("#param").blur(function () {
+            param = $("#param")
+            param.find('.collapser').remove()
+            param = JSON.stringify(param.text());
+            $("#param").JSONView(JSON.parse(param));
+        });
+
+
+        $("#data").blur(function () {
+            data = $("#data")
+            data.find('.collapser').remove()
+            data = JSON.stringify(data.text());
+            $("#data").JSONView(JSON.parse(data));
+        });
+
+        $("#assert").blur(function () {
+            assert = $("#assert")
+            assert.find('.collapser').remove()
+            assert = JSON.stringify(assert.text());
+            $("#assert").JSONView(JSON.parse(assert));
+        });
+
+
+    });
 
 
 
